@@ -1,0 +1,16 @@
+{
+  "short_name": "A2K Store",
+  "name": "A2K Store — Tecnología seleccionada",
+  "description": "Productos tecnológicos premium con una experiencia de compra moderna.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0a0a0f",
+  "background_color": "#0a0a0f",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
