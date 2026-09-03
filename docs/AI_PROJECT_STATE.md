@@ -7,10 +7,10 @@
 
 | Campo | Valor |
 |-------|-------|
-| Fase actual | 2 (Backend y base de datos) |
+| Fase actual | 3 (Autenticación) |
 | Bloque actual | B (Fases 2 + 3) |
 | Último bloque completado | A (Fases 0 + 1) |
-| Último commit | `0a1423d docs: persistencia y continuidad del proyecto A2K Store` |
+| Último commit | `0d3387a feat(bloque-b): database schema, RLS, services, types` |
 | Rama | `main` |
 | Remote | `origin` → `git@github.com:tiendadigitalaipro/a2k-store.git` |
 | Estado del repositorio | Limpio, sincronizado con origin/main |
@@ -50,7 +50,7 @@
 ## Pendiente
 
 ### BLOQUE B — Backend y autenticación
-- [ ] Fase 2: Supabase (esquema, Auth, RLS, Storage, migraciones)
+- [x] Fase 2: Supabase (esquema, Auth, RLS, Storage, migraciones) ✅
 - [ ] Fase 3: Autenticación (registro, login, verificación email, recuperación)
 
 ### BLOQUE C — Checkout, inventario, pagos
@@ -191,3 +191,13 @@ src/
 | Commit | `c74b1a6` |
 | Problemas | Sin `node_modules/` para verificar build |
 | Siguiente acción | BLOQUE B: Backend Supabase + Autenticación |
+
+### Sesión 2 — 2026-09-04
+
+| Campo | Valor |
+|-------|-------|
+| Fecha | 2026-09-04 |
+| Trabajo realizado | BLOQUE B: B1 (build verification) + B2 (database) + B3 (RLS) + B4 (services) + B5 (types) |
+| Commits | `eae6b47`, `0d3387a` |
+| Problemas | Button/ref TS error corregido; Supabase client requiere `any` type sin paquete instalado |
+| Siguiente acción | Fase 3: Autenticación (conectar Supabase Auth) |
