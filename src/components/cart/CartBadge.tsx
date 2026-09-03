@@ -3,10 +3,15 @@ import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 
 export function CartBadge() {
-  const { itemCount } = useCart()
+  const { itemCount, toggleCart } = useCart()
 
   return (
-    <Button variant="ghost" size="icon" aria-label={`Carrito con ${itemCount} productos`}>
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleCart}
+      aria-label={`Carrito con ${itemCount} productos`}
+    >
       <span className="relative">
         <Icon name="cart" size={20} />
         {itemCount > 0 && (

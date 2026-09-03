@@ -3,18 +3,20 @@ export const SITE = {
   tagline: 'Tecnología que se siente premium',
   description:
     'Descubre productos tecnológicos seleccionados con diseño, calidad y una experiencia de compra moderna.',
-  url: 'https://a2k-store.vercel.app',
+  url: 'https://store.a2kdigitalstudio.online',
   locale: 'es',
   currency: 'USD',
   currencySymbol: '$',
   contact: {
-    email: 'hola@a2k.digital',
+    email: 'ceo@a2kdigitalstudio.online',
     phone: '+58 416 411 7331',
     whatsapp: '584164117331',
+    whatsappSecondary: '584126148666',
   },
-  social: {
-    instagram: 'https://instagram.com/a2kdigitalstudio',
-    twitter: 'https://twitter.com/a2kdigitalstudio',
-    facebook: 'https://facebook.com/a2kdigitalstudio',
+  business: {
+    name: 'A2K Store',
+    hours: '7:00 a.m. – 10:00 p.m.',
+    pickup: 'Ocumare del Tuy',
+    market: 'Venezuela',
   },
 } as const

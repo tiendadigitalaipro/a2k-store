@@ -5,8 +5,8 @@ import { SITE } from '@/config/site'
 const footerLinks = {
   tienda: [
     { to: '/catalogo', label: 'Catálogo' },
-    { to: '/catalogo?filter=nuevos', label: 'Nuevos' },
-    { to: '/catalogo?filter=destacados', label: 'Destacados' },
+    { to: '/catalogo?sort=newest', label: 'Nuevos' },
+    { to: '/catalogo?featured=true', label: 'Destacados' },
   ],
   soporte: [
     { to: '/contacto', label: 'Contacto' },

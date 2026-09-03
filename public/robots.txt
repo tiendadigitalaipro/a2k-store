@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://a2k-store.vercel.app/sitemap.xml
+Sitemap: https://store.a2kdigitalstudio.online/sitemap.xml

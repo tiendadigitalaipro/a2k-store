@@ -26,16 +26,26 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         (item) => item.product.id === product.id && item.variantId === variantId,
       )
 
+      // Determine available stock for this product/variant
+      const availableStock = variantId
+        ? product.variants?.find((v) => v.id === variantId)?.stock ?? product.stock
+        : product.stock
+
       if (existingIndex >= 0) {
         const nextItems = [...state.items]
+        const newQty = Math.min(
+          nextItems[existingIndex].quantity + quantity,
+          availableStock,
+        )
         nextItems[existingIndex] = {
           ...nextItems[existingIndex],
-          quantity: nextItems[existingIndex].quantity + quantity,
+          quantity: newQty,
         }
         return { ...state, items: nextItems }
       }
 
-      return { ...state, items: [...state.items, { product, quantity, variantId }] }
+      const clampedQty = Math.min(quantity, availableStock)
+      return { ...state, items: [...state.items, { product, quantity: clampedQty, variantId }] }
     }
     case 'REMOVE_ITEM': {
       const { productId, variantId = null } = action.payload
@@ -58,11 +68,15 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       }
       return {
         ...state,
-        items: state.items.map((item) =>
-          item.product.id === productId && item.variantId === variantId
-            ? { ...item, quantity }
-            : item,
-        ),
+        items: state.items.map((item) => {
+          if (item.product.id !== productId || item.variantId !== variantId) return item
+          // Enforce stock limit: never allow quantity > available stock
+          const maxStock = item.variantId
+            ? item.product.variants?.find((v) => v.id === item.variantId)?.stock ?? item.product.stock
+            : item.product.stock
+          const clampedQty = Math.min(quantity, maxStock)
+          return { ...item, quantity: clampedQty }
+        }),
       }
     }
     case 'CLEAR_CART':
