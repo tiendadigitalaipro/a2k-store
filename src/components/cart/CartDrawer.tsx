@@ -10,15 +10,18 @@ import { formatPrice } from '@/lib/format'
 export function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, subtotal, itemCount } = useCart()
   const navigate = useNavigate()
-  const closeButtonRef = useRef<HTMLButtonElement>(null)
   const previousFocusRef = useRef<HTMLElement | null>(null)
+  const drawerRef = useRef<HTMLDivElement>(null)
 
   // Focus management: trap focus inside drawer when open
   useEffect(() => {
     if (isOpen) {
       previousFocusRef.current = document.activeElement as HTMLElement
       // Small delay to allow animation to start
-      const timer = setTimeout(() => closeButtonRef.current?.focus(), 100)
+      const timer = setTimeout(() => {
+        const btn = drawerRef.current?.querySelector<HTMLButtonElement>('[data-close-cart]')
+        btn?.focus()
+      }, 100)
       return () => clearTimeout(timer)
     } else {
       previousFocusRef.current?.focus()
@@ -71,6 +74,7 @@ export function CartDrawer() {
 
           {/* Drawer panel */}
           <motion.aside
+            ref={drawerRef}
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -91,7 +95,7 @@ export function CartDrawer() {
                 )}
               </h2>
               <Button
-                ref={closeButtonRef}
+                data-close-cart
                 variant="ghost"
                 size="icon"
                 onClick={closeCart}
