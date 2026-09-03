@@ -10,7 +10,7 @@
 | Fase actual | 2 (Backend y base de datos) |
 | Bloque actual | B (Fases 2 + 3) |
 | Último bloque completado | A (Fases 0 + 1) |
-| Último commit | `c74b1a6 feat(bloque-a): cart drawer, gallery, variants, filters, SEO, a11y` |
+| Último commit | `0a1423d docs: persistencia y continuidad del proyecto A2K Store` |
 | Rama | `main` |
 | Remote | `origin` → `git@github.com:tiendadigitalaipro/a2k-store.git` |
 | Estado del repositorio | Limpio, sincronizado con origin/main |
