@@ -6,6 +6,7 @@ import { Icon } from '@/components/ui/Icon'
 import { cn } from '@/lib/utils'
 import { MobileMenu } from './MobileMenu'
 import { CartBadge } from '@/components/cart/CartBadge'
+import { useAuth } from '@/context/AuthContext'
 
 const links = [
   { to: '/', label: 'Inicio' },
@@ -14,6 +15,7 @@ const links = [
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { user } = useAuth()
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border glass">
@@ -54,6 +56,23 @@ export function Header() {
 
           <div className="flex items-center gap-2">
             <CartBadge />
+
+            {user ? (
+              <Link
+                to="/mi-cuenta"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                aria-label="Mi cuenta"
+              >
+                <Icon name="user" size={18} />
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="hidden rounded-lg px-3 py-2 text-sm font-medium text-muted hover:bg-surface-elevated hover:text-foreground transition-colors md:block"
+              >
+                Iniciar sesión
+              </Link>
+            )}
 
             <Button
               variant="ghost"
