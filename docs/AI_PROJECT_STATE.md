@@ -7,10 +7,10 @@
 
 | Campo | Valor |
 |-------|-------|
-| Fase actual | 3 (Autenticación) |
-| Bloque actual | B (Fases 2 + 3) |
-| Último bloque completado | A (Fases 0 + 1) |
-| Último commit | `0aaaf02` (refactor(migrations): reorder to fix FK dependencies) |
+| Fase actual | 4 (Checkout) |
+| Bloque actual | C (Fases 4 + 5 + 6) |
+| Último bloque completado | B (Fases 2 + 3) |
+| Último commit | `6efa200` (feat(fase-3): auth context, login/register) |
 | Rama | `main` |
 | Remote | `origin` → `git@github.com:tiendadigitalaipro/a2k-store.git` |
 | Estado del repositorio | Limpio, sincronizado con origin/main |
@@ -69,8 +69,9 @@
 
 ## Pendiente
 
-### BLOQUE B — Backend y autenticación
-- [ ] Fase 3: Autenticación (registro, login, verificación email, recuperación)
+### BLOQUE B — Backend y autenticación ✅
+- [x] Fase 2: Supabase ✅
+- [x] Fase 3: Autenticación ✅
 
 ### BLOQUE C — Checkout, inventario, pagos
 - [ ] Fase 4: Checkout (datos, entrega, pago, revisión)
