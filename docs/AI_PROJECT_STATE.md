@@ -10,7 +10,7 @@
 | Fase actual | 3 (Autenticación) |
 | Bloque actual | B (Fases 2 + 3) |
 | Último bloque completado | A (Fases 0 + 1) |
-| Último commit | `fc90d90` (docs: actualizar estado post-bloque-b) |
+| Último commit | `0aaaf02` (refactor(migrations): reorder to fix FK dependencies) |
 | Rama | `main` |
 | Remote | `origin` → `git@github.com:tiendadigitalaipro/a2k-store.git` |
 | Estado del repositorio | Limpio, sincronizado con origin/main |
@@ -54,9 +54,9 @@
 - [x] `npm run build` limpio: 422 modules, 380KB JS
 - [x] TypeScript sin errores
 
-**B2 — Database schema (Supabase) ✅ (auditado y corregido)**
-- [x] 12 migraciones SQL (00001–00012)
-- [x] 33 tablas con RLS habilitado
+**B2 — Database schema (Supabase) ✅ (auditado, corregido y aplicado)**
+- [x] 11 migraciones SQL (00001–00011) — reordenadas por dependencias
+- [x] 34 tablas con RLS habilitado
 - [x] Enums completos (incluye `customer` role)
 - [x] Helper functions con `search_path` hardening
 - [x] Funciones RPC atómicas para inventario
@@ -64,6 +64,8 @@
 - [x] Stock reservation con validación de concurrencia
 - [x] Service layer completo (6 servicios)
 - [x] TypeScript types completos para todas las tablas
+- [x] Aplicado a Supabase (`lreccgsruakmaaamjidr`)
+- [x] Seed data: 13 business_settings, 1 exchange_rate
 
 ## Pendiente
 
@@ -192,14 +194,13 @@ supabase/
     ├── 00002_create_profiles_and_roles.sql
     ├── 00003_create_catalog.sql
     ├── 00004_create_inventory.sql
-    ├── 00005_create_orders.sql
-    ├── 00006_create_payments.sql
-    ├── 00007_create_shipping.sql
-    ├── 00008_create_promotions_coupons.sql
-    ├── 00009_create_reviews_qa_wishlist.sql
-    ├── 00010_create_notifications_settings_audit.sql
-    ├── 00011_enable_rls.sql
-    └── 00012_add_stock_rpc_functions.sql
+    ├── 00005_create_base_tables.sql (payment_methods, shipping_carriers, promotions, coupons)
+    ├── 00006_create_orders.sql
+    ├── 00007_create_order_junctions.sql (order_payments, payment_receipts, order_shipping, coupon_usage)
+    ├── 00008_create_reviews_qa_wishlist.sql
+    ├── 00009_create_notifications_settings_audit.sql
+    ├── 00010_enable_rls.sql
+    └── 00011_add_stock_rpc_functions.sql
 ```
 
 ## Riesgos / Bloqueos
@@ -222,9 +223,10 @@ supabase/
 | Tests | ❌ | Sin framework de testing |
 | Secretos en código | ✅ | Ninguno encontrado |
 | Git status limpio | ✅ | Working tree clean |
-| Push exitoso | ✅ | `fc90d90` en origin/main |
-| Migraciones SQL | ✅ | 12 archivos, orden correcto, dependencias verificadas |
-| RLS | ✅ | 33 tablas, políticas completas |
+| Push exitoso | ✅ | `0aaaf02` en origin/main |
+| Migraciones SQL | ✅ | 11 archivos, orden corregido, aplicadas a Supabase |
+| Supabase remoto | ✅ | 34 tablas, RLS, funciones, seed data verificados |
+| RLS | ✅ | 34 tablas, políticas completas |
 | SECURITY DEFINER | ✅ | Todas con `search_path` hardening |
 | Funciones RPC atómicas | ✅ | `decrement_stock`, `create_stock_reservation`, `expire_overdue_reservations` |
 | Advisory lock | ✅ | `generate_order_number()` protegido |
