@@ -1,6 +1,8 @@
 -- ============================================================
 -- A2K Store — Orders, Items, Status History
 -- ============================================================
+-- Depends on: customers (00002), payment_methods (00005),
+-- coupons (00005), promotions (00005)
 
 -- Order number sequence (per year)
 CREATE TABLE public.order_sequences (
@@ -11,7 +13,7 @@ CREATE TABLE public.order_sequences (
 -- Orders
 CREATE TABLE public.orders (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  order_number      TEXT NOT NULL UNIQUE,  -- A2K-2026-000001
+  order_number      TEXT NOT NULL UNIQUE,
   customer_id       UUID NOT NULL REFERENCES public.customers(id),
   address_id        UUID REFERENCES public.customer_addresses(id),
 
@@ -31,8 +33,8 @@ CREATE TABLE public.orders (
   shipping_cost     NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (shipping_cost >= 0),
   total             NUMERIC(12,2) NOT NULL CHECK (total >= 0),
   currency          TEXT NOT NULL DEFAULT 'USD',
-  exchange_rate     NUMERIC(12,4),  -- A2K rate at time of order
-  total_local       NUMERIC(14,2),  -- total in VES
+  exchange_rate     NUMERIC(12,4),
+  total_local       NUMERIC(14,2),
 
   -- Payment
   payment_method_id UUID REFERENCES public.payment_methods(id),
@@ -57,12 +59,12 @@ CREATE TABLE public.orders (
   reservation_expires_at TIMESTAMPTZ
 );
 
--- Order items (snapshot — never recalculated)
+-- Order items (snapshot — no FK to products to preserve history)
 CREATE TABLE public.order_items (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id        UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
-  product_id      UUID NOT NULL,  -- no FK: preserves snapshot
-  variant_id      UUID,           -- no FK: preserves snapshot
+  product_id      UUID NOT NULL,
+  variant_id      UUID,
   product_name    TEXT NOT NULL,
   product_sku     TEXT NOT NULL,
   variant_name    TEXT,
@@ -111,8 +113,6 @@ DECLARE
   v_number TEXT;
 BEGIN
   v_year := EXTRACT(YEAR FROM now());
-
-  -- Advisory lock prevents concurrent inserts from producing duplicate numbers
   PERFORM pg_advisory_xact_lock(hashtext('order_sequence_' || v_year));
 
   INSERT INTO public.order_sequences (year, last_number)
@@ -126,10 +126,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SET search_path = public, pg_temp;
 
--- ============================================================
 -- Auto-generate order number on insert
--- ============================================================
-
 CREATE OR REPLACE FUNCTION public.set_order_number()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -144,10 +141,7 @@ CREATE TRIGGER trg_orders_set_order_number
   BEFORE INSERT ON public.orders
   FOR EACH ROW EXECUTE FUNCTION public.set_order_number();
 
--- ============================================================
 -- Auto-create status history on status change
--- ============================================================
-
 CREATE OR REPLACE FUNCTION public.log_order_status_change()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -155,7 +149,6 @@ BEGIN
     INSERT INTO public.order_status_history (order_id, old_status, new_status, changed_by)
     VALUES (NEW.id, OLD.status, NEW.status, auth.uid());
 
-    -- Set timestamps based on status
     CASE NEW.status
       WHEN 'payment_approved' THEN NEW.paid_at := COALESCE(NEW.paid_at, now());
       WHEN 'shipped' THEN NEW.shipped_at := COALESCE(NEW.shipped_at, now());
@@ -172,7 +165,7 @@ CREATE TRIGGER trg_orders_log_status_change
   BEFORE UPDATE ON public.orders
   FOR EACH ROW EXECUTE FUNCTION public.log_order_status_change();
 
--- Add FK from stock_reservations to orders now that orders exists
+-- Add FK from stock_reservations to orders (stock_reservations created in 00004)
 ALTER TABLE public.stock_reservations
   ADD CONSTRAINT fk_stock_reservations_order_id
   FOREIGN KEY (order_id) REFERENCES public.orders(id) ON DELETE SET NULL;
