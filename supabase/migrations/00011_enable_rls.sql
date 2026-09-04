@@ -49,7 +49,7 @@ BEGIN
     WHERE id = auth.uid() AND role = required_role AND is_active = true
   );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE SET search_path = public, pg_temp;
 
 -- Helper: check if user is admin (superadmin or admin)
 CREATE OR REPLACE FUNCTION public.is_admin()
@@ -62,7 +62,7 @@ BEGIN
     AND is_active = true
   );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE SET search_path = public, pg_temp;
 
 -- Helper: get customer_id for current user
 CREATE OR REPLACE FUNCTION public.get_customer_id()
@@ -73,7 +73,7 @@ BEGIN
     WHERE profile_id = auth.uid()
   );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE SET search_path = public, pg_temp;
 
 -- ============================================================
 -- PROFILES
@@ -455,6 +455,14 @@ CREATE POLICY "reviews_update_admin" ON public.reviews
 -- Review photos: public read, admin write
 CREATE POLICY "review_photos_select_public" ON public.review_photos
   FOR SELECT USING (true);
+
+CREATE POLICY "review_photos_insert_own" ON public.review_photos
+  FOR INSERT WITH CHECK (
+    review_id IN (
+      SELECT id FROM public.reviews
+      WHERE customer_id = public.get_customer_id()
+    )
+  );
 
 CREATE POLICY "review_photos_insert_admin" ON public.review_photos
   FOR INSERT WITH CHECK (public.is_admin());

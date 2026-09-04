@@ -3,7 +3,10 @@
 -- ============================================================
 
 -- User roles
+-- 'customer' = regular customer (default for new signups)
+-- Staff roles: superadmin, admin, orders, inventory, products, customer_service, finance
 CREATE TYPE public.user_role AS ENUM (
+  'customer',
   'superadmin',
   'admin',
   'orders',

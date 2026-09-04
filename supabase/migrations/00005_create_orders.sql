@@ -112,6 +112,9 @@ DECLARE
 BEGIN
   v_year := EXTRACT(YEAR FROM now());
 
+  -- Advisory lock prevents concurrent inserts from producing duplicate numbers
+  PERFORM pg_advisory_xact_lock(hashtext('order_sequence_' || v_year));
+
   INSERT INTO public.order_sequences (year, last_number)
   VALUES (v_year, 1)
   ON CONFLICT (year) DO UPDATE
@@ -121,7 +124,7 @@ BEGIN
   v_number := 'A2K-' || v_year || '-' || LPAD(v_next::TEXT, 6, '0');
   RETURN v_number;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = public, pg_temp;
 
 -- ============================================================
 -- Auto-generate order number on insert
@@ -135,7 +138,7 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = public, pg_temp;
 
 CREATE TRIGGER trg_orders_set_order_number
   BEFORE INSERT ON public.orders
@@ -163,7 +166,7 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = public, pg_temp;
 
 CREATE TRIGGER trg_orders_log_status_change
   BEFORE UPDATE ON public.orders

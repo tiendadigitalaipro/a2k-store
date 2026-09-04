@@ -91,7 +91,7 @@ BEGIN
   -- to avoid heavy computation on every review change
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = public, pg_temp;
 
 -- Note: Product rating will be computed on-demand or cached via application logic
 -- to avoid expensive triggers on high-traffic review updates.

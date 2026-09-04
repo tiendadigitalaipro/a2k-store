@@ -6,7 +6,7 @@
  */
 
 import { supabase } from '@/lib/supabase'
-import type { StockReservation, InventoryMovement } from '@/lib/supabase/types'
+import type { InventoryMovement } from '@/lib/supabase/types'
 
 // ============================================================
 // Stock queries
@@ -36,9 +36,9 @@ export async function getAvailableStock(
 // ============================================================
 
 /**
- * Create a stock reservation.
+ * Create a stock reservation atomically.
+ * Uses database RPC to prevent overselling under concurrent access.
  * Called when an order is created (pending_payment).
- * Duration comes from business_settings.
  */
 export async function createReservation(params: {
   productId: string
@@ -46,24 +46,20 @@ export async function createReservation(params: {
   orderId: string
   quantity: number
   expiresAt: string
-}): Promise<{ data: StockReservation | null; error: string | null }> {
+}): Promise<{ data: { id: string } | null; error: string | null }> {
   const client = supabase()
   if (!client) return { data: null, error: 'Supabase not configured' }
 
-  const { data, error } = await client
-    .from('stock_reservations')
-    .insert({
-      product_id: params.productId,
-      variant_id: params.variantId ?? null,
-      order_id: params.orderId,
-      quantity: params.quantity,
-      status: 'active',
-      expires_at: params.expiresAt,
-    })
-    .select()
-    .single()
+  const { data, error } = await client.rpc('create_stock_reservation', {
+    p_product_id: params.productId,
+    p_variant_id: params.variantId ?? null,
+    p_order_id: params.orderId,
+    p_quantity: params.quantity,
+    p_expires_at: params.expiresAt,
+  })
 
-  return { data, error: error?.message ?? null }
+  if (error) return { data: null, error: error.message }
+  return { data: { id: data }, error: null }
 }
 
 /**
@@ -113,7 +109,7 @@ export async function consumeReservation(
 
 /**
  * Expire all overdue reservations.
- * Should be called periodically (e.g., via cron or Edge Function).
+ * Uses atomic RPC. Should be called periodically (e.g., via cron or Edge Function).
  */
 export async function expireOverdueReservations(): Promise<{
   count: number
@@ -122,18 +118,10 @@ export async function expireOverdueReservations(): Promise<{
   const client = supabase()
   if (!client) return { count: 0, error: 'Supabase not configured' }
 
-  const { data, error } = await client
-    .from('stock_reservations')
-    .update({
-      status: 'expired',
-      released_at: new Date().toISOString(),
-      released_reason: 'expired',
-    })
-    .eq('status', 'active')
-    .lt('expires_at', new Date().toISOString())
-    .select('id')
+  const { data, error } = await client.rpc('expire_overdue_reservations')
 
-  return { count: data?.length ?? 0, error: error?.message ?? null }
+  if (error) return { count: 0, error: error.message }
+  return { count: data ?? 0, error: null }
 }
 
 // ============================================================
@@ -175,6 +163,7 @@ export async function recordMovement(params: {
 
 /**
  * Decrement stock definitively (when order is delivered).
+ * Uses atomic RPC to prevent race conditions.
  * This is the ONLY time stock is permanently reduced.
  */
 export async function decrementStock(params: {
@@ -186,40 +175,14 @@ export async function decrementStock(params: {
   const client = supabase()
   if (!client) return { error: 'Supabase not configured' }
 
-  // Update stock on product/variant
-  const table = params.variantId ? 'product_variants' : 'products'
-  const id = params.variantId ?? params.productId
-
-  const { data: current, error: fetchError } = await client
-    .from(table)
-    .select('stock')
-    .eq('id', id)
-    .single()
-
-  if (fetchError) return { error: fetchError.message }
-  if (!current) return { error: 'Product/variant not found' }
-
-  const newStock = Math.max(current.stock - params.quantity, 0)
-
-  const { error: updateError } = await client
-    .from(table)
-    .update({ stock: newStock })
-    .eq('id', id)
-
-  if (updateError) return { error: updateError.message }
-
-  // Record movement
-  await recordMovement({
-    productId: params.productId,
-    variantId: params.variantId,
-    movementType: 'sale',
-    quantity: -params.quantity,
-    reason: 'Order delivered',
-    referenceId: params.orderId,
-    referenceType: 'order',
+  const { error } = await client.rpc('decrement_stock', {
+    p_product_id: params.productId,
+    p_variant_id: params.variantId ?? null,
+    p_quantity: params.quantity,
+    p_order_id: params.orderId,
   })
 
-  return { error: null }
+  return { error: error?.message ?? null }
 }
 
 // Type import for movement type

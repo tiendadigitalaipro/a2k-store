@@ -59,6 +59,8 @@ CREATE OR REPLACE FUNCTION public.get_available_stock(
   p_product_id UUID,
   p_variant_id UUID DEFAULT NULL
 ) RETURNS INTEGER AS $$
+-- Note: not SECURITY DEFINER, uses STABLE for query optimization
+-- search_path set for defense in depth
 DECLARE
   v_stock INTEGER;
   v_reserved INTEGER;
@@ -88,7 +90,7 @@ BEGIN
 
   RETURN v_available;
 END;
-$$ LANGUAGE plpgsql STABLE;
+$$ LANGUAGE plpgsql STABLE SET search_path = public, pg_temp;
 
 -- ============================================================
 -- Trigger: auto-update stock_reserved on products when
@@ -97,14 +99,29 @@ $$ LANGUAGE plpgsql STABLE;
 
 CREATE OR REPLACE FUNCTION public.update_stock_reserved()
 RETURNS TRIGGER AS $$
+DECLARE
+  v_stock INTEGER;
+  v_reserved INTEGER;
 BEGIN
   IF TG_OP = 'INSERT' AND NEW.status = 'active' THEN
-    -- Increment reserved
+    -- Validate that enough stock is available before reserving
     IF NEW.variant_id IS NOT NULL THEN
+      SELECT stock, stock_reserved INTO v_stock, v_reserved
+      FROM public.product_variants WHERE id = NEW.variant_id;
+      IF (v_stock - v_reserved) < NEW.quantity THEN
+        RAISE EXCEPTION 'Insufficient stock for reservation. Available: %, requested: %',
+          (v_stock - v_reserved), NEW.quantity;
+      END IF;
       UPDATE public.product_variants
       SET stock_reserved = stock_reserved + NEW.quantity
       WHERE id = NEW.variant_id;
     ELSE
+      SELECT stock, stock_reserved INTO v_stock, v_reserved
+      FROM public.products WHERE id = NEW.product_id;
+      IF (v_stock - v_reserved) < NEW.quantity THEN
+        RAISE EXCEPTION 'Insufficient stock for reservation. Available: %, requested: %',
+          (v_stock - v_reserved), NEW.quantity;
+      END IF;
       UPDATE public.products
       SET stock_reserved = stock_reserved + NEW.quantity
       WHERE id = NEW.product_id;

@@ -10,6 +10,7 @@
 // ============================================================
 
 export type UserRole =
+  | 'customer'
   | 'superadmin'
   | 'admin'
   | 'orders'
@@ -596,6 +597,30 @@ export interface Database {
       get_customer_id: {
         Args: Record<string, never>
         Returns: string | null
+      }
+      decrement_stock: {
+        Args: {
+          p_product_id: string
+          p_variant_id: string | null
+          p_quantity: number
+          p_order_id: string
+          p_performed_by?: string
+        }
+        Returns: boolean
+      }
+      create_stock_reservation: {
+        Args: {
+          p_product_id: string
+          p_variant_id: string | null
+          p_order_id: string
+          p_quantity: number
+          p_expires_at: string
+        }
+        Returns: string
+      }
+      expire_overdue_reservations: {
+        Args: Record<string, never>
+        Returns: number
       }
     }
   }

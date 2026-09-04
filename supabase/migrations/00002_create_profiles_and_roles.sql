@@ -8,7 +8,7 @@ CREATE TABLE public.profiles (
   email           TEXT NOT NULL,
   full_name       TEXT NOT NULL,
   whatsapp        TEXT,
-  role            public.user_role NOT NULL DEFAULT 'customer_service',
+  role            public.user_role NOT NULL DEFAULT 'customer',
   is_active       BOOLEAN NOT NULL DEFAULT true,
   email_verified  BOOLEAN NOT NULL DEFAULT false,
   two_factor_enabled BOOLEAN NOT NULL DEFAULT false,
@@ -69,7 +69,7 @@ BEGIN
   NEW.updated_at = now();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = public, pg_temp;
 
 -- Apply updated_at triggers
 CREATE TRIGGER set_profiles_updated_at
