@@ -1,0 +1,93 @@
+[
+  {
+    "id": "915f040d-b813-4db8-918d-252e6e6cc67d",
+    "is_active": true,
+    "name": "Calzados",
+    "slug": "calzados",
+    "sort_order": 1
+  },
+  {
+    "id": "a1a91849-6c7f-4bf0-a947-a2f815a53cfd",
+    "is_active": true,
+    "name": "Tecnología",
+    "slug": "tecnologia",
+    "sort_order": 1
+  },
+  {
+    "id": "ae8f9a27-0b1e-4f93-aadb-b485b54e2263",
+    "is_active": true,
+    "name": "Audio",
+    "slug": "audio",
+    "sort_order": 2
+  },
+  {
+    "id": "9d9da2a2-d289-494d-8fe8-5b9a15d5a576",
+    "is_active": true,
+    "name": "Cocina",
+    "slug": "cocina",
+    "sort_order": 2
+  },
+  {
+    "id": "2ff4df24-a228-4186-ae5b-17043eec6d33",
+    "is_active": true,
+    "name": "Hogar",
+    "slug": "hogar",
+    "sort_order": 3
+  },
+  {
+    "id": "8b4028b5-8b1c-4975-b4ae-e0413a34969a",
+    "is_active": true,
+    "name": "Wearables",
+    "slug": "wearables",
+    "sort_order": 3
+  },
+  {
+    "id": "e43520b6-10bb-4211-a0c6-2430368df7ff",
+    "is_active": true,
+    "name": "Fotografía",
+    "slug": "fotografia",
+    "sort_order": 4
+  },
+  {
+    "id": "35889fa9-d981-4fb2-bf40-46aa18684bea",
+    "is_active": true,
+    "name": "Repuestos y Accesorios",
+    "slug": "repuestos-y-accesorios",
+    "sort_order": 4
+  },
+  {
+    "id": "32085196-6efb-4ee8-8235-ae04a9bfbf02",
+    "is_active": true,
+    "name": "Accesorios",
+    "slug": "accesorios",
+    "sort_order": 5
+  },
+  {
+    "id": "93ff38e6-ed26-4207-8e72-5bc2325d6325",
+    "is_active": true,
+    "name": "Ropa para Niños",
+    "slug": "ropa-para-ninos",
+    "sort_order": 5
+  },
+  {
+    "id": "78d6e8bc-36b1-4f7d-8236-9d5e5ea77189",
+    "is_active": true,
+    "name": "Gaming",
+    "slug": "gaming",
+    "sort_order": 6
+  },
+  {
+    "id": "3b1c73f7-0044-4a05-bf49-be3481857719",
+    "is_active": true,
+    "name": "Ropa Deportiva para Caballeros",
+    "slug": "ropa-deportiva-caballeros",
+    "sort_order": 6
+  },
+  {
+    "id": "15c78ac6-4920-4cb4-b4d9-cae23a7c0e4b",
+    "is_active": true,
+    "name": "Electrónica",
+    "slug": "electronica",
+    "sort_order": 7
+  }
+]

@@ -1,0 +1,449 @@
+{
+  "generated_at": "2026-09-06T20:19:21.276Z",
+  "definitive_categories": {
+    "count": 7,
+    "expected": 7,
+    "missing": [],
+    "categories": [
+      {
+        "id": "915f040d-b813-4db8-918d-252e6e6cc67d",
+        "name": "Calzados",
+        "slug": "calzados",
+        "sort_order": 1
+      },
+      {
+        "id": "9d9da2a2-d289-494d-8fe8-5b9a15d5a576",
+        "name": "Cocina",
+        "slug": "cocina",
+        "sort_order": 2
+      },
+      {
+        "id": "2ff4df24-a228-4186-ae5b-17043eec6d33",
+        "name": "Hogar",
+        "slug": "hogar",
+        "sort_order": 3
+      },
+      {
+        "id": "35889fa9-d981-4fb2-bf40-46aa18684bea",
+        "name": "Repuestos y Accesorios",
+        "slug": "repuestos-y-accesorios",
+        "sort_order": 4
+      },
+      {
+        "id": "93ff38e6-ed26-4207-8e72-5bc2325d6325",
+        "name": "Ropa para Niños",
+        "slug": "ropa-para-ninos",
+        "sort_order": 5
+      },
+      {
+        "id": "3b1c73f7-0044-4a05-bf49-be3481857719",
+        "name": "Ropa Deportiva para Caballeros",
+        "slug": "ropa-deportiva-caballeros",
+        "sort_order": 6
+      },
+      {
+        "id": "15c78ac6-4920-4cb4-b4d9-cae23a7c0e4b",
+        "name": "Electrónica",
+        "slug": "electronica",
+        "sort_order": 7
+      }
+    ]
+  },
+  "existing_products_count": 12,
+  "existing_products_demo": [
+    {
+      "id": "639872c0-09ad-44df-aa25-73ddd54ad78e",
+      "sku": "MBA-M3-13",
+      "name": "MacBook Air M3",
+      "slug": "macbook-air-m3",
+      "category_id": "a1a91849-6c7f-4bf0-a947-a2f815a53cfd",
+      "category_name": "Tecnología"
+    },
+    {
+      "id": "e1d1861e-f98a-4c60-8121-10784f1ed8ce",
+      "sku": "SONY-XM5-BLK",
+      "name": "Sony WH-1000XM5",
+      "slug": "sony-wh-1000xm5",
+      "category_id": "ae8f9a27-0b1e-4f93-aadb-b485b54e2263",
+      "category_name": "Audio"
+    },
+    {
+      "id": "3a8737ba-fe55-4ac1-8f3b-a6754d149203",
+      "sku": "AWU2-49",
+      "name": "Apple Watch Ultra 2",
+      "slug": "apple-watch-ultra-2",
+      "category_id": "8b4028b5-8b1c-4975-b4ae-e0413a34969a",
+      "category_name": "Wearables"
+    },
+    {
+      "id": "fa98560b-3d60-4108-b67f-86c3a94ac8b0",
+      "sku": "CANON-R6-BODY",
+      "name": "Canon EOS R6",
+      "slug": "canon-eos-r6",
+      "category_id": "e43520b6-10bb-4211-a0c6-2430368df7ff",
+      "category_name": "Fotografía"
+    },
+    {
+      "id": "abd6bbc6-16c4-4e00-8dbd-2150d3fdfc94",
+      "sku": "KCR-Q1-PRO",
+      "name": "Keychron Q1 Pro",
+      "slug": "keychron-q1-pro",
+      "category_id": "32085196-6efb-4ee8-8235-ae04a9bfbf02",
+      "category_name": "Accesorios"
+    },
+    {
+      "id": "57b6d188-6372-4f3c-9a5b-c57569d6a489",
+      "sku": "LOG-MX3S",
+      "name": "Logitech MX Master 3S",
+      "slug": "logitech-mx-master-3s",
+      "category_id": "32085196-6efb-4ee8-8235-ae04a9bfbf02",
+      "category_name": "Accesorios"
+    },
+    {
+      "id": "4802196c-eb2f-4ac9-b2e4-205383db7fa4",
+      "sku": "IP15P-128",
+      "name": "iPhone 15 Pro",
+      "slug": "iphone-15-pro",
+      "category_id": "a1a91849-6c7f-4bf0-a947-a2f815a53cfd",
+      "category_name": "Tecnología"
+    },
+    {
+      "id": "6c1fdbba-9d25-4f08-aea3-51bc7dac0882",
+      "sku": "IPAD-M4-11",
+      "name": "iPad Pro M4",
+      "slug": "ipad-pro-m4",
+      "category_id": "a1a91849-6c7f-4bf0-a947-a2f815a53cfd",
+      "category_name": "Tecnología"
+    },
+    {
+      "id": "8ad54736-a2c0-4077-ab85-eb55f20ca071",
+      "sku": "SONOS-ERA100",
+      "name": "Sonos Era 100",
+      "slug": "sonos-era-100",
+      "category_id": "ae8f9a27-0b1e-4f93-aadb-b485b54e2263",
+      "category_name": "Audio"
+    },
+    {
+      "id": "2df7611f-79ef-4fee-a1bf-0645dc4763a9",
+      "sku": "META-Q3-128",
+      "name": "Meta Quest 3",
+      "slug": "meta-quest-3",
+      "category_id": "78d6e8bc-36b1-4f7d-8236-9d5e5ea77189",
+      "category_name": "Gaming"
+    },
+    {
+      "id": "8eb65209-21c9-47d2-b2fe-7b070289f6e3",
+      "sku": "DELL-XPS15-OLED",
+      "name": "Dell XPS 15",
+      "slug": "dell-xps-15",
+      "category_id": "a1a91849-6c7f-4bf0-a947-a2f815a53cfd",
+      "category_name": "Tecnología"
+    },
+    {
+      "id": "5a741c0a-6522-45e5-b39a-a7f4a60a811f",
+      "sku": "BOSE-QC-ULT",
+      "name": "Bose QuietComfort Ultra",
+      "slug": "bose-quietcomfort-ultra",
+      "category_id": "ae8f9a27-0b1e-4f93-aadb-b485b54e2263",
+      "category_name": "Audio"
+    }
+  ],
+  "sku_report": [
+    {
+      "sku": "CAL-001",
+      "product_name_proposed": "Zapatilla deportiva running turquesa",
+      "slug_proposed": "zapatilla-running-turquesa",
+      "category_name": "Calzados",
+      "category_slug": "calzados",
+      "category_id": "915f040d-b813-4db8-918d-252e6e6cc67d",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "O1CN012hxNBf1PaYci9RPnI_!!2222117231857-0-cib.jpg",
+      "media_gallery_count": 4
+    },
+    {
+      "sku": "CAL-002",
+      "product_name_proposed": "Zapatilla deportiva running CloudTec",
+      "slug_proposed": "zapatilla-running-cloudtec-cuus-duus",
+      "category_name": "Calzados",
+      "category_slug": "calzados",
+      "category_id": "915f040d-b813-4db8-918d-252e6e6cc67d",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "WhatsApp Image 2026-09-06 at 10.38.51 AM.jpeg",
+      "media_gallery_count": 33
+    },
+    {
+      "sku": "CAL-003",
+      "product_name_proposed": "Zapatilla deportiva running NOKA",
+      "slug_proposed": "zapatilla-running-noka",
+      "category_name": "Calzados",
+      "category_slug": "calzados",
+      "category_id": "915f040d-b813-4db8-918d-252e6e6cc67d",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "WhatsApp Image 2026-09-06 at 10.38.45 AM (4).jpeg",
+      "media_gallery_count": 5
+    },
+    {
+      "sku": "ELE-001",
+      "product_name_proposed": "Combo smartwatch + audífonos + correas",
+      "slug_proposed": "combo-smartwatch-audifonos-correas",
+      "category_name": "Electrónica",
+      "category_slug": "electronica",
+      "category_id": "15c78ac6-4920-4cb4-b4d9-cae23a7c0e4b",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "WhatsApp Image 2026-09-06 at 10.38.51 AM (2).jpeg",
+      "media_gallery_count": 3
+    },
+    {
+      "sku": "ELE-002",
+      "product_name_proposed": "Smartwatch / reloj inteligente",
+      "slug_proposed": "smartwatch-reloj-inteligente",
+      "category_name": "Electrónica",
+      "category_slug": "electronica",
+      "category_id": "15c78ac6-4920-4cb4-b4d9-cae23a7c0e4b",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "WhatsApp Image 2026-08-13 at 3.46.50 PM.jpeg15.jpeg",
+      "media_gallery_count": 5
+    },
+    {
+      "sku": "ELE-003",
+      "product_name_proposed": "Audífonos inalámbricos con estuche pantalla",
+      "slug_proposed": "audifonos-inalambricos-estuche-pantalla",
+      "category_name": "Electrónica",
+      "category_slug": "electronica",
+      "category_id": "15c78ac6-4920-4cb4-b4d9-cae23a7c0e4b",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "WhatsApp Image 2026-08-12 at 3.43.58 PM.jpeg",
+      "media_gallery_count": 2
+    },
+    {
+      "sku": "ELE-004",
+      "product_name_proposed": "Micrófono inalámbrico de solapa doble",
+      "slug_proposed": "microfono-inalambrico-solapa-doble",
+      "category_name": "Electrónica",
+      "category_slug": "electronica",
+      "category_id": "15c78ac6-4920-4cb4-b4d9-cae23a7c0e4b",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "WhatsApp Image 2026-09-06 at 10.38.51 AM (5).jpeg",
+      "media_gallery_count": 3
+    },
+    {
+      "sku": "ELE-005",
+      "product_name_proposed": "Micrófono inalámbrico de solapa simple",
+      "slug_proposed": "microfono-inalambrico-solapa-simple",
+      "category_name": "Electrónica",
+      "category_slug": "electronica",
+      "category_id": "15c78ac6-4920-4cb4-b4d9-cae23a7c0e4b",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "WhatsApp Image 2026-08-12 at 2.20.13 PM.jpeg",
+      "media_gallery_count": 4
+    },
+    {
+      "sku": "HOG-001",
+      "product_name_proposed": "Carrito de compras plegable con asiento",
+      "slug_proposed": "carrito-compras-plegable-asiento",
+      "category_name": "Hogar",
+      "category_slug": "hogar",
+      "category_id": "2ff4df24-a228-4186-ae5b-17043eec6d33",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "O1CN018DtPe21o8UgDlUe4T_!!2208525925180-0-cib.jpg",
+      "media_gallery_count": 13
+    },
+    {
+      "sku": "HOG-002",
+      "product_name_proposed": "Filtro de agua para grifo",
+      "slug_proposed": "filtro-agua-grifo",
+      "category_name": "Hogar",
+      "category_slug": "hogar",
+      "category_id": "2ff4df24-a228-4186-ae5b-17043eec6d33",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "WhatsApp Image 2026-09-06 at 10.38.51 AM (6).jpeg",
+      "media_gallery_count": 0
+    },
+    {
+      "sku": "HOG-003",
+      "product_name_proposed": "Pegamento fuerte multiusos AO DE GU / MAGIC GLUE",
+      "slug_proposed": "pegamento-fuerte-ao-de-gu",
+      "category_name": "Hogar",
+      "category_slug": "hogar",
+      "category_id": "2ff4df24-a228-4186-ae5b-17043eec6d33",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "O1CN016Qh1TH1gkx2g4Wm5n_!!994204181-0-cib.jpg",
+      "media_gallery_count": 5
+    },
+    {
+      "sku": "RDC-001",
+      "product_name_proposed": "Camiseta deportiva para caballero — surtido",
+      "slug_proposed": "camiseta-deportiva-caballero-surtido",
+      "category_name": "Ropa Deportiva para Caballeros",
+      "category_slug": "ropa-deportiva-caballeros",
+      "category_id": "3b1c73f7-0044-4a05-bf49-be3481857719",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "O1CN0104U8SR1SEWQ92cLXd_!!2214054902215-0-cib.jpg",
+      "media_gallery_count": 19
+    },
+    {
+      "sku": "RDC-002",
+      "product_name_proposed": "Short deportivo 2 en 1",
+      "slug_proposed": "short-deportivo-2-en-1",
+      "category_name": "Ropa Deportiva para Caballeros",
+      "category_slug": "ropa-deportiva-caballeros",
+      "category_id": "3b1c73f7-0044-4a05-bf49-be3481857719",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "O1CN01285Ttn29xt98pqMrx_!!2220162858135-0-cib.jpg",
+      "media_gallery_count": 11
+    },
+    {
+      "sku": "REP-001",
+      "product_name_proposed": "Placa detectora YCS para diagnóstico de celulares",
+      "slug_proposed": "placa-detectora-ycs",
+      "category_name": "Repuestos y Accesorios",
+      "category_slug": "repuestos-y-accesorios",
+      "category_id": "35889fa9-d981-4fb2-bf40-46aa18684bea",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "O1CN0130xbau2BJF9Jokn3N_!!2138748317-0-cib.jpg",
+      "media_gallery_count": 3
+    },
+    {
+      "sku": "RPN-001",
+      "product_name_proposed": "Conjunto infantil estampado — Colección A",
+      "slug_proposed": "conjunto-infantil-estampado-coleccion-a",
+      "category_name": "Ropa para Niños",
+      "category_slug": "ropa-para-ninos",
+      "category_id": "93ff38e6-ed26-4207-8e72-5bc2325d6325",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "O1CN0109qnf024bq06zER26_!!2219021487410-0-cib (1).jpg",
+      "media_gallery_count": 32
+    },
+    {
+      "sku": "RPN-002",
+      "product_name_proposed": "Conjunto infantil estampado — Colección B",
+      "slug_proposed": "conjunto-infantil-estampado-coleccion-b",
+      "category_name": "Ropa para Niños",
+      "category_slug": "ropa-para-ninos",
+      "category_id": "93ff38e6-ed26-4207-8e72-5bc2325d6325",
+      "product_exists": false,
+      "product_id": null,
+      "needs_creation": true,
+      "conflicts": [],
+      "media_main": "O1CN016bsuTb1ZmbCyc0XTs_!!2222335923237-0-cib.jpg",
+      "media_gallery_count": 11
+    }
+  ],
+  "global_conflicts": [],
+  "demo_products_in_definitive_categories": [],
+  "required_fields_for_creation": [
+    {
+      "field": "name",
+      "has_value": true,
+      "note": "Provisto en el manifiesto."
+    },
+    {
+      "field": "slug",
+      "has_value": true,
+      "note": "Provisto en el manifiesto."
+    },
+    {
+      "field": "sku",
+      "has_value": true,
+      "note": "Provisto en el manifiesto."
+    },
+    {
+      "field": "category_id",
+      "has_value": true,
+      "note": "Asignable desde categorías definitivas."
+    },
+    {
+      "field": "status",
+      "has_value": false,
+      "note": "Requerido (enum). Valor sugerido: active. No inventado."
+    },
+    {
+      "field": "price",
+      "has_value": false,
+      "note": "Requerido (numeric). FALTA: no inventar precio."
+    },
+    {
+      "field": "currency",
+      "has_value": false,
+      "note": "Requerido (text). Valor probable: USD. Confirmar."
+    },
+    {
+      "field": "stock",
+      "has_value": false,
+      "note": "Requerido (integer). FALTA: no inventar stock."
+    },
+    {
+      "field": "stock_reserved",
+      "has_value": false,
+      "note": "Requerido (integer). Valor inicial sugerido: 0."
+    },
+    {
+      "field": "stock_minimum",
+      "has_value": false,
+      "note": "Requerido (integer). Valor inicial sugerido: 0."
+    },
+    {
+      "field": "is_featured",
+      "has_value": false,
+      "note": "Requerido (boolean). Valor inicial sugerido: false."
+    },
+    {
+      "field": "is_new",
+      "has_value": false,
+      "note": "Requerido (boolean). Valor inicial sugerido: true."
+    }
+  ],
+  "summary": {
+    "proposed_skus": 16,
+    "existing_skus_matching": 0,
+    "new_skus_needed": 16,
+    "slugs_already_used": 0,
+    "definitive_categories_present": 7,
+    "demo_categories_present": 6
+  }
+}

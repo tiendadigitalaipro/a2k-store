@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-09-06T21:06:39.973Z",
+  "total_skus": 16,
+  "definitive_categories": 6,
+  "skus_with_conflict": 0,
+  "skus_existing_in_products": 0,
+  "skus_without_category": 0,
+  "skus_without_approved_media": 0,
+  "products_ready_for_creation": 16,
+  "price_pending": 0,
+  "stock_pending": 0,
+  "validations": {
+    "total_skus": true,
+    "all_prices_defined": true,
+    "all_stock_defined": true,
+    "all_draft": true,
+    "all_correct_categories": true,
+    "no_sku_conflicts": true,
+    "no_existing_real_products": true,
+    "all_have_approved_media": true,
+    "one_main_per_sku": true,
+    "zero_duplicate_storage_paths": true
+  },
+  "issues": []
+}

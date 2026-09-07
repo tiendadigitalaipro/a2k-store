@@ -19,15 +19,17 @@ Construir una tienda online de producción llamada **A2K Store** para el mercado
 | Email | Resend |
 | WhatsApp | Meta WhatsApp Business Platform / Cloud API |
 
-## Stack actual (commit c74b1a6)
+## Stack actual (estado actual, sin commit pendiente)
 
 - React 19 + TypeScript (strict mode) + Vite 6
 - React Router 6.30
 - Tailwind CSS 4 con `@tailwindcss/vite`
 - Framer Motion 11.15
-- Sin dependencias adicionales
-- Sin backend todavía
-- Datos hard-coded en `src/data/products.ts` (12 productos demo)
+- Supabase conectado (PostgreSQL, Auth, Storage, RLS)
+- 23 migraciones SQL aplicadas a Supabase (00001–00023)
+- 16 productos reales activos con imágenes en Supabase Storage
+- 12 productos demo inactivos
+- Build producción exitoso: 485 modules, 639KB JS
 
 ## Decisiones de negocio confirmadas
 
@@ -76,12 +78,23 @@ Implementado:
 - Accesibilidad: skip link, aria-labels
 - Config actualizada con datos de negocio correctos
 
+### BLOQUE G, Fase 18 — Catálogo real ✅ Completado
+- 7 categorías reales creadas en Supabase
+- Bucket `products` configurado en Supabase Storage
+- 169 imágenes reales subidas a Storage
+- 16 productos reales creados y activados
+- 12 productos demo desactivados
+- 169 registros en `product_images`
+- Build producción exitoso
+- QA visual y funcional aprobado
+- Commit: (pendiente)
+
 ## Fases pendientes
 
 | Fase | Descripción | Estado |
 |------|-------------|--------|
-| 2 | Backend y base de datos (Supabase) | ⏳ |
-| 3 | Autenticación | ⏳ |
+| 2 | Backend y base de datos (Supabase) | ✅ Completado |
+| 3 | Autenticación | ✅ Completado |
 | 4 | Checkout | ⏳ |
 | 5 | Inventario y reservas | ⏳ |
 | 6 | Pagos | ⏳ |
@@ -93,11 +106,11 @@ Implementado:
 | 12 | Roles y seguridad admin | ⏳ |
 | 13 | Promociones y cupones | ⏳ |
 | 14 | Wishlist, reviews y Q&A | ⏳ |
-| 15 | Imágenes y storage | ⏳ |
-| 16 | Categorías y marcas | ⏳ |
+| 15 | Imágenes y storage | ✅ Completado en Fase 18 |
+| 16 | Categorías y marcas | ✅ Categorías reales completadas en Fase 18 |
 | 17 | Notificaciones | ⏳ |
-| 18 | Catálogo real | ⏳ |
-| 19 | Configuración de negocio | ⏳ |
+| 18 | Catálogo real | ✅ Completado |
+| 19 | Configuración de negocio | ⏳ Siguiente paso |
 | 20 | Testing y producción | ⏳ |
 
 ## Restricciones
@@ -111,11 +124,17 @@ Implementado:
 
 ## Bloqueos actuales
 
-- `node_modules/` no existe — no se puede verificar build TypeScript
-- Sin credenciales de Supabase — no se puede conectar backend
+- Precios estimados: 12 productos tienen precios provisionales que requieren confirmación comercial
+- Stock provisional: 16 productos tienen stock = 10 unidades que deben validarse contra inventario real
 - Sin credenciales de Resend — no se puede enviar email
 - Sin credenciales de WhatsApp Cloud API — no se puede enviar notificaciones
 - Sin dominio configurado en Vercel — no se puede deployar
+
+## Bloqueos resueltos
+
+- ✅ `node_modules/` disponible — build TypeScript verificado
+- ✅ Credenciales de Supabase configuradas — backend conectado
+- ✅ Datos demo hard-coded — reemplazados por catálogo real en Supabase
 
 ## Información de contacto (no es secreto)
 

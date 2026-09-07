@@ -7,13 +7,13 @@
 
 | Campo | Valor |
 |-------|-------|
-| Fase actual | 4 (Checkout) |
-| Bloque actual | C (Fases 4 + 5 + 6) |
-| Último bloque completado | B (Fases 2 + 3) |
+| Fase actual | 18 (Catálogo real) — completada |
+| Bloque actual | G (Fases 18 + 19 + 20) |
+| Último bloque completado | B (Fases 2 + 3) — G parcial (Fase 18 completada) |
 | Último commit | `6efa200` (feat(fase-3): auth context, login/register) |
 | Rama | `main` |
 | Remote | `origin` → `git@github.com:tiendadigitalaipro/a2k-store.git` |
-| Estado del repositorio | Limpio, sincronizado con origin/main |
+| Estado del repositorio | Modificado (migraciones 00021–00023, scripts de carga, reportes QA); sin commit |
 
 ## Completado
 
@@ -67,6 +67,26 @@
 - [x] Aplicado a Supabase (`lreccgsruakmaaamjidr`)
 - [x] Seed data: 13 business_settings, 1 exchange_rate
 
+### BLOQUE G — Producción (parcial)
+
+**Fase 18 — Catálogo real ✅**
+- [x] 7 categorías reales creadas idempotentemente (`00021_seed_real_categories.sql`)
+  - Calzados, Cocina, Hogar, Repuestos y Accesorios, Ropa para Niños, Ropa Deportiva para Caballeros, Electrónica
+- [x] Bucket `products` configurado en Supabase Storage (`00022_setup_products_storage.sql`)
+  - Público, límite 10 MB, MIME types de imagen permitidos
+  - Policies RLS para lectura pública, escritura admin y service_role
+- [x] 16 productos reales creados con `status = 'inactive'`
+- [x] 169 imágenes reales subidas a `products/<slug>/main.jpg` y `products/<slug>/gallery/NN.jpg`
+- [x] 169 registros creados en `product_images`
+- [x] Migración `00023_activate_real_products.sql`: productos demo desactivados, 16 productos reales activados
+- [x] `npm run build` exitoso (485 modules, 639KB JS)
+- [x] QA visual y funcional del catálogo aprobado
+  - 16 productos reales visibles, 0 productos demo visibles
+  - Imágenes cargando correctamente, 0 rotas
+  - Filtros por categoría funcionando
+  - Detalle de producto y galerías funcionando
+  - Sin errores críticos en consola
+
 ## Pendiente
 
 ### BLOQUE B — Backend y autenticación ✅
@@ -91,28 +111,28 @@
 
 ### BLOQUE F — Funciones adicionales
 - [ ] Fase 14: Wishlist, reviews y Q&A
-- [ ] Fase 15: Imágenes y storage
-- [ ] Fase 16: Categorías y marcas
+- [x] Fase 15: Imágenes y storage — completada en Fase 18
+- [x] Fase 16: Categorías y marcas — categorías reales completadas en Fase 18
 - [ ] Fase 17: Notificaciones
 
 ### BLOQUE G — Producción
-- [ ] Fase 18: Catálogo real
+- [x] Fase 18: Catálogo real
 - [ ] Fase 19: Configuración de negocio
 - [ ] Fase 20: Testing y producción
 
 ## Próximo paso
 
-**BLOQUE B, Fase 3: Autenticación** — Conectar Supabase Auth con el service layer existente.
+**BLOQUE G, Fase 19: Configuración de negocio** — Completar datos comerciales y preparar producción.
 
 Acciones concretas:
-1. Implementar AuthContext con React Context
-2. Crear páginas de Login, Registro, Recuperar contraseña
-3. Conectar authService con la UI
-4. Crear perfil de cliente automáticamente al registrarse
-5. Proteger rutas según rol
-6. Commit y push
+1. Revisar y ajustar precios estimados de los 12 productos no electrónicos (CAL, HOG, RDC, REP, RPN, ELE-001)
+2. Confirmar stock real vs. stock provisional de 10 unidades
+3. Definir costos internos si aplica
+4. Revisar descripciones y SEO de productos
+5. Configurar datos de negocio en `business_settings` (tasa A2K, horario, contacto, etc.)
+6. Commit y push de las migraciones 00021–00023 y scripts de carga
 
-**Dependencia:** Requiere credenciales de Supabase (URL + anon key) para conexión real. Sin credenciales, la arquitectura está lista para conectar.
+**Nota:** La Fase 3 (Autenticación) del BLOQUE B ya fue completada previamente según el historial del repositorio.
 
 ## Correcciones de auditoría B2 (2026-09-05)
 
@@ -181,7 +201,7 @@ src/
 │   └── ui/          Badge, Button, Card, Container, Icon, Input, VisuallyHidden
 ├── config/          site.ts
 ├── context/         CartContext.tsx
-├── data/            products.ts, categories.ts (DEMO — será reemplazado)
+├── data/            products.ts, categories.ts (DEMO — inactivos, reemplazados por datos reales en Supabase)
 ├── hooks/           useCart.ts
 ├── lib/             format.ts, utils.ts, supabase/
 ├── pages/           Home, Catalog, ProductDetail, NotFound
@@ -201,36 +221,55 @@ supabase/
     ├── 00008_create_reviews_qa_wishlist.sql
     ├── 00009_create_notifications_settings_audit.sql
     ├── 00010_enable_rls.sql
-    └── 00011_add_stock_rpc_functions.sql
+    ├── 00011_add_stock_rpc_functions.sql
+    ├── 00012_auth_triggers.sql
+    ├── 00013_security_hardening.sql
+    ├── 00014_harden_orders_insert_status.sql
+    ├── 00015_seed_checkout_config.sql
+    ├── 00016_order_financial_validation.sql
+    ├── 00017_create_order_checkout_rpc.sql
+    ├── 00018_seed_catalog.sql
+    ├── 00019_grant_table_privileges.sql
+    ├── 00020_add_reservation_duration_setting.sql
+    ├── 00021_seed_real_categories.sql
+    ├── 00022_setup_products_storage.sql
+    └── 00023_activate_real_products.sql
 ```
 
 ## Riesgos / Bloqueos
 
 | Bloqueo | Impacto | Mitigación |
 |---------|---------|------------|
-| Sin credenciales Supabase | No se puede conectar backend | Arquitectura lista, falta URL + anon key |
+| Sin credenciales Supabase | Resuelto | URL + anon key configurados en `.env.local`; backend conectado |
 | Sin credenciales Resend | No se puede enviar email | Dejar interfaz preparada, marcar bloqueo |
 | Sin credenciales WhatsApp | No se puede enviar notificaciones | Crear abstracción de proveedor configurable |
 | Sin dominio Vercel | No se puede deployar | Preparar configuración, documentar proceso |
-| Datos demo hard-coded | No son catálogo real | Fase 18 reemplazará con catálogo real desde Admin |
+| Datos demo hard-coded | Resuelto | Catálogo real activado: 16 productos reales con 169 imágenes en Storage |
+| Precios estimados | 12 productos con precio provisional | Revisar y ajustar en Fase 19 antes de producción |
+| Stock provisional | 16 productos con stock = 10 | Confirmar inventario real en Fase 19 |
 
 ## Verificaciones
 
 | Verificación | Estado | Notas |
 |-------------|--------|-------|
 | TypeScript compile | ✅ | Sin errores |
-| Build producción | ✅ | 422 modules, 380KB JS |
+| Build producción | ✅ | 485 modules, 639KB JS, 185KB gzip |
 | Lint | ❌ | Sin ESLint configurado |
 | Tests | ❌ | Sin framework de testing |
 | Secretos en código | ✅ | Ninguno encontrado |
-| Git status limpio | ✅ | Working tree clean |
-| Push exitoso | ✅ | `0aaaf02` en origin/main |
-| Migraciones SQL | ✅ | 11 archivos, orden corregido, aplicadas a Supabase |
+| Git status limpio | ❌ | Working tree modificado: migraciones 00021–00023, scripts de carga, reportes QA |
+| Push exitoso | ❌ | Pendiente commit/push de la sesión actual |
+| Migraciones SQL | ✅ | 23 archivos (00001–00023), aplicadas a Supabase |
 | Supabase remoto | ✅ | 34 tablas, RLS, funciones, seed data verificados |
 | RLS | ✅ | 34 tablas, políticas completas |
 | SECURITY DEFINER | ✅ | Todas con `search_path` hardening |
 | Funciones RPC atómicas | ✅ | `decrement_stock`, `create_stock_reservation`, `expire_overdue_reservations` |
 | Advisory lock | ✅ | `generate_order_number()` protegido |
+| Bucket `products` Storage | ✅ | Público, 10 MB límite, MIME images, policies RLS |
+| Imágenes en Storage | ✅ | 169 objetos, 0 duplicados, URLs públicas accesibles |
+| Productos activos | ✅ | 16 productos reales activos |
+| Productos demo | ✅ | 12 productos demo inactivos |
+| QA catálogo | ✅ | Aprobado: 16/16 productos visibles, imágenes OK, filtros OK, detalle OK |
 
 ## Historial de sesiones
 
@@ -263,3 +302,14 @@ supabase/
 | Cambios | 12 migraciones auditadas, 8 problemas corregidos, 1 nueva migración (00012) |
 | Commits | (pendiente) |
 | Siguiente acción | Fase 3: Autenticación |
+
+### Sesión 4 — 2026-09-06
+
+| Campo | Valor |
+|-------|-------|
+| Fecha | 2026-09-06 |
+| Trabajo realizado | **BLOQUE G, Fase 18: Catálogo real** — carga, activación y QA |
+| Cambios | 3 migraciones SQL (00021–00023), 169 imágenes en Supabase Storage, 16 productos reales activos, 12 productos demo inactivos |
+| Commits | (pendiente) |
+| Problemas | Ninguno crítico. Solo warnings no bloqueantes de React Router v7 y advertencia de chunk > 500 KB |
+| Siguiente acción | Fase 19: Configuración de negocio (precios reales, stock real, datos de negocio) |
