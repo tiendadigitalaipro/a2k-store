@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Container } from '@/components/ui/Container'
@@ -6,9 +6,9 @@ import { Badge } from '@/components/ui/Badge'
 import { Input } from '@/components/ui/Input'
 import { Icon } from '@/components/ui/Icon'
 import { ProductGrid } from '@/components/product/ProductGrid'
-import { products } from '@/data/products'
-import { categories } from '@/data/categories'
-import type { Product } from '@/types'
+import { getActiveProducts } from '@/services/products'
+import { getActiveCategories } from '@/services/categories'
+import type { Product, Category } from '@/types'
 
 type SortOption = 'relevance' | 'price-asc' | 'price-desc' | 'newest' | 'rating'
 
@@ -40,25 +40,52 @@ export default function Catalog() {
   const minPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined
   const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined
 
+  const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function load() {
+      const [productsResult, categoriesResult] = await Promise.all([
+        getActiveProducts(),
+        getActiveCategories(),
+      ])
+
+      if (cancelled) return
+
+      if (productsResult.error) {
+        setError(productsResult.error)
+      } else {
+        setProducts(productsResult.data)
+      }
+
+      if (categoriesResult.error) {
+        setError((prev) => prev ?? categoriesResult.error)
+      } else {
+        setCategories(categoriesResult.data)
+      }
+
+      setLoading(false)
+    }
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      // Category filter
       if (categorySlug && product.categorySlug !== categorySlug) return false
-
-      // Featured filter
       if (featuredOnly && !product.isFeatured) return false
-
-      // New filter
       if (newOnly && !product.isNew) return false
-
-      // Stock filter
       if (inStockOnly && product.stock <= 0) return false
-
-      // Price filter
       if (minPrice !== undefined && product.price < minPrice) return false
       if (maxPrice !== undefined && product.price > maxPrice) return false
 
-      // Search query — extended to cover more fields
       if (query) {
         const search = query.toLowerCase()
         const matchesName = product.name.toLowerCase().includes(search)
@@ -67,11 +94,12 @@ export default function Catalog() {
         const matchesSku = product.sku.toLowerCase().includes(search)
         const matchesCategory = product.categoryName?.toLowerCase().includes(search) ?? false
         const matchesTags = product.tags.some((tag) => tag.toLowerCase().includes(search))
-        const matchesVariant = product.variants?.some(
-          (v) =>
-            v.name.toLowerCase().includes(search) ||
-            v.sku.toLowerCase().includes(search),
-        ) ?? false
+        const matchesVariant =
+          product.variants?.some(
+            (v) =>
+              v.name.toLowerCase().includes(search) ||
+              v.sku.toLowerCase().includes(search),
+          ) ?? false
 
         if (
           !matchesName &&
@@ -88,9 +116,12 @@ export default function Catalog() {
 
       return true
     })
-  }, [categorySlug, query, featuredOnly, newOnly, inStockOnly, minPrice, maxPrice])
+  }, [products, categorySlug, query, featuredOnly, newOnly, inStockOnly, minPrice, maxPrice])
 
-  const sortedProducts = useMemo(() => sortProducts(filteredProducts, sort), [filteredProducts, sort])
+  const sortedProducts = useMemo(
+    () => sortProducts(filteredProducts, sort),
+    [filteredProducts, sort],
+  )
 
   const setParam = (key: string, value: string | undefined) => {
     const next = new URLSearchParams(searchParams)
@@ -125,6 +156,14 @@ export default function Catalog() {
     setSearchParams(next, { replace: true })
   }
 
+  if (loading) {
+    return (
+      <Container className="py-20 text-center">
+        <p className="text-muted">Cargando catálogo...</p>
+      </Container>
+    )
+  }
+
   return (
     <Container className="py-12 md:py-20">
       <motion.div
@@ -143,6 +182,12 @@ export default function Catalog() {
           Explora nuestra selección de tecnología, audio, wearables y accesorios premium.
         </p>
       </motion.div>
+
+      {error && (
+        <div className="mb-6 rounded-xl border border-danger/20 bg-danger/10 px-4 py-3 text-sm text-danger">
+          Error cargando el catálogo: {error}
+        </div>
+      )}
 
       {/* Filters bar */}
       <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -250,7 +295,8 @@ export default function Catalog() {
 
       {/* Results count */}
       <p className="mb-6 text-sm text-muted">
-        {sortedProducts.length} {sortedProducts.length === 1 ? 'producto encontrado' : 'productos encontrados'}
+        {sortedProducts.length}{' '}
+        {sortedProducts.length === 1 ? 'producto encontrado' : 'productos encontrados'}
       </p>
 
       <ProductGrid products={sortedProducts} />

@@ -24,3 +24,15 @@ dist-ssr
 .DS_Store
 *.local
 supabase/.temp/
+
+supabase/.branches/
+
+# QA / temporary artifacts
+*.tsbuildinfo
+*-qa.png
+FORENSIC_*.json
+*_files.json
+collage_*.jpg
+*_temp.*
+media_inventory.json
+PRODUCT_MEDIA_UPLOAD_MANIFEST.json

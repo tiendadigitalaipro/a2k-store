@@ -7,7 +7,10 @@ import ProductDetail from '@/pages/ProductDetail'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import ForgotPassword from '@/pages/ForgotPassword'
+import ResetPassword from '@/pages/ResetPassword'
 import Account from '@/pages/Account'
+import Checkout from '@/pages/Checkout'
+import CheckoutConfirmation from '@/pages/CheckoutConfirmation'
 import NotFound from '@/pages/NotFound'
 
 export function AppRouter() {
@@ -29,6 +32,24 @@ export function AppRouter() {
           }
         />
 
+        <Route
+          path="checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="checkout/confirmado"
+          element={
+            <ProtectedRoute>
+              <CheckoutConfirmation />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="*" element={<NotFound />} />
       </Route>
 
@@ -36,6 +57,7 @@ export function AppRouter() {
       <Route path="login" element={<Login />} />
       <Route path="registro" element={<Register />} />
       <Route path="recuperar-password" element={<ForgotPassword />} />
+      <Route path="reset-password" element={<ResetPassword />} />
     </Routes>
   )
 }

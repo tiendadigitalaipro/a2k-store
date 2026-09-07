@@ -1,13 +1,32 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { ProductGrid } from '@/components/product/ProductGrid'
-import { getFeaturedProducts } from '@/data/products'
+import { getFeaturedProducts } from '@/services/products'
+import type { Product } from '@/types'
 
 export function FeaturedProducts() {
-  const featured = getFeaturedProducts(4)
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+
+    getFeaturedProducts(4).then(({ data, error }) => {
+      if (cancelled) return
+      if (!error && data) {
+        setProducts(data)
+      }
+      setLoading(false)
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <section className="py-16 md:py-24">
@@ -33,7 +52,11 @@ export function FeaturedProducts() {
           </Link>
         </motion.div>
 
-        <ProductGrid products={featured} />
+        {loading ? (
+          <div className="py-12 text-center text-muted">Cargando destacados...</div>
+        ) : (
+          <ProductGrid products={products} />
+        )}
       </Container>
     </section>
   )

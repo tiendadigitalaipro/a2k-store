@@ -957,6 +957,7 @@ export type Database = {
           payment_link: string | null
           requires_receipt: boolean
           requires_verification: boolean
+          slug: string | null
           sort_order: number
           type: Database["public"]["Enums"]["payment_method_type"]
           updated_at: string
@@ -972,6 +973,7 @@ export type Database = {
           payment_link?: string | null
           requires_receipt?: boolean
           requires_verification?: boolean
+          slug?: string | null
           sort_order?: number
           type?: Database["public"]["Enums"]["payment_method_type"]
           updated_at?: string
@@ -987,6 +989,7 @@ export type Database = {
           payment_link?: string | null
           requires_receipt?: boolean
           requires_verification?: boolean
+          slug?: string | null
           sort_order?: number
           type?: Database["public"]["Enums"]["payment_method_type"]
           updated_at?: string
@@ -1849,6 +1852,17 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      create_order_checkout: {
+        Args: {
+          p_address_id?: string
+          p_delivery_method: Database["public"]["Enums"]["delivery_method"]
+          p_items: Json
+          p_payment_method_id: string
+          p_customer_notes?: string
+          p_reservation_minutes?: number
+        }
+        Returns: Json
+      }
     }
     Enums: {
       claim_resolution:

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Container } from '@/components/ui/Container'
@@ -9,41 +9,86 @@ import { ProductImage } from '@/components/product/ProductImage'
 import { ProductPrice } from '@/components/product/ProductPrice'
 import { ProductBadges } from '@/components/product/ProductBadge'
 import { AddToCartButton } from '@/components/cart/AddToCartButton'
-import { getProductBySlug, products } from '@/data/products'
+import { getProductBySlug } from '@/services/products'
+import { getFeaturedProducts } from '@/services/products'
 import { calculateDiscount } from '@/lib/format'
-import type { ProductVariant } from '@/types'
+import type { Product, ProductVariant } from '@/types'
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
-  const product = slug ? getProductBySlug(slug) : undefined
 
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
-    product?.variants?.[0] ?? null,
-  )
+  const [product, setProduct] = useState<Product | null>(null)
+  const [related, setRelated] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
-  // Build gallery: main image + gallery images
+  useEffect(() => {
+    if (!slug) return
+
+    const productSlug = slug
+    let cancelled = false
+
+    async function load() {
+      const { data, error: productError } = await getProductBySlug(productSlug)
+
+      if (cancelled) return
+
+      if (productError) {
+        setError(productError)
+        setLoading(false)
+        return
+      }
+
+      if (!data) {
+        setProduct(null)
+        setLoading(false)
+        return
+      }
+
+      setProduct(data)
+      setSelectedVariant(data.variants?.[0] ?? null)
+      setSelectedImageIndex(0)
+
+      const { data: featured } = await getFeaturedProducts(4)
+      if (!cancelled && featured) {
+        setRelated(featured.filter((p) => p.id !== data.id).slice(0, 3))
+      }
+
+      setLoading(false)
+    }
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [slug])
+
   const gallery = useMemo(() => {
     if (!product) return []
     const images = [product.imageUrl, ...(product.gallery ?? [])]
-    // Deduplicate
     return [...new Set(images)]
   }, [product])
 
-  // Current display values based on variant selection
-  const currentPrice = selectedVariant?.price ?? product?.price ?? 0
-  const currentStock = selectedVariant?.stock ?? product?.stock ?? 0
-  const currentSku = selectedVariant?.sku ?? product?.sku ?? ''
-  const isOutOfStock = currentStock <= 0
-  const isActive = selectedVariant ? (selectedVariant as { active?: boolean }).active !== false : true
+  if (loading) {
+    return (
+      <Container className="py-20 text-center">
+        <p className="text-muted">Cargando producto...</p>
+      </Container>
+    )
+  }
 
-  if (!product) {
+  if (error || !product) {
     return (
       <Container className="flex flex-col items-center justify-center py-32 text-center">
         <p className="text-6xl font-bold text-primary">404</p>
         <h1 className="mt-4 text-2xl font-bold text-foreground">Producto no encontrado</h1>
-        <p className="mt-2 text-muted">El producto que buscas no existe o fue removido.</p>
+        <p className="mt-2 text-muted">
+          {error ? `Error: ${error}` : 'El producto que buscas no existe o fue removido.'}
+        </p>
         <Button onClick={() => navigate('/catalogo')} className="mt-6">
           Volver al catálogo
         </Button>
@@ -51,10 +96,13 @@ export default function ProductDetail() {
     )
   }
 
+  const currentPrice = selectedVariant?.price ?? product.price
+  const currentStock = selectedVariant?.stock ?? product.stock
+  const currentSku = selectedVariant?.sku ?? product.sku
+  const isOutOfStock = currentStock <= 0
+  const isActive = selectedVariant ? true : true
+
   const discount = calculateDiscount(currentPrice, product.compareAtPrice)
-  const related = products
-    .filter((p) => p.categoryId === product.categoryId && p.id !== product.id)
-    .slice(0, 3)
 
   return (
     <Container className="py-12 md:py-20">
@@ -71,7 +119,6 @@ export default function ProductDetail() {
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
           {/* Image gallery */}
           <div className="flex flex-col gap-4">
-            {/* Main image */}
             <div className="relative overflow-hidden rounded-2xl border border-border bg-surface">
               <ProductBadges
                 isNew={product.isNew}
@@ -86,7 +133,6 @@ export default function ProductDetail() {
               />
             </div>
 
-            {/* Thumbnails */}
             {gallery.length > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {gallery.map((img, index) => (
@@ -117,7 +163,6 @@ export default function ProductDetail() {
             </h1>
             <p className="mt-4 text-base leading-relaxed text-muted">{product.description}</p>
 
-            {/* Price */}
             <div className="mt-8">
               <ProductPrice
                 price={currentPrice}
@@ -126,7 +171,6 @@ export default function ProductDetail() {
               />
             </div>
 
-            {/* Variant selector */}
             {product.variants && product.variants.length > 0 && (
               <div className="mt-6">
                 <p className="mb-3 text-sm font-medium text-foreground">
@@ -137,7 +181,6 @@ export default function ProductDetail() {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {product.variants.map((variant) => {
-                    const variantActive = (variant as { active?: boolean }).active !== false
                     const variantInStock = variant.stock > 0
                     const isSelected = selectedVariant?.id === variant.id
 
@@ -148,11 +191,11 @@ export default function ProductDetail() {
                           setSelectedVariant(isSelected ? null : variant)
                           setSelectedImageIndex(0)
                         }}
-                        disabled={!variantActive || !variantInStock}
+                        disabled={!variantInStock}
                         className={`rounded-xl border px-4 py-2 text-sm font-medium transition-colors ${
                           isSelected
                             ? 'border-primary bg-primary-subtle text-primary'
-                            : !variantActive || !variantInStock
+                            : !variantInStock
                               ? 'cursor-not-allowed border-border bg-surface text-muted opacity-50'
                               : 'border-border bg-surface text-muted hover:border-border-strong hover:bg-surface-elevated'
                         }`}
@@ -170,7 +213,6 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* Add to cart */}
             <div className="mt-8 flex flex-wrap items-center gap-3">
               {isOutOfStock ? (
                 <Button size="lg" disabled className="min-w-[180px]">
@@ -180,6 +222,7 @@ export default function ProductDetail() {
               ) : (
                 <AddToCartButton
                   product={product}
+                  selectedVariant={selectedVariant}
                   variant={isActive ? 'primary' : 'secondary'}
                   size="lg"
                   className="min-w-[180px]"
@@ -190,7 +233,6 @@ export default function ProductDetail() {
               </Badge>
             </div>
 
-            {/* Product details */}
             <div className="mt-10 space-y-4 border-t border-border pt-8 text-sm text-muted">
               <p>
                 <span className="font-medium text-foreground">SKU:</span> {currentSku}
@@ -209,21 +251,11 @@ export default function ProductDetail() {
                   ))}
                 </p>
               )}
-              {product.rating && (
-                <p className="flex items-center gap-2">
-                  <span className="font-medium text-foreground">Valoración:</span>
-                  <span className="flex items-center gap-1 text-warning">
-                    <Icon name="star" size={16} className="fill-current" />
-                    {product.rating} ({product.reviewCount} reseñas)
-                  </span>
-                </p>
-              )}
             </div>
           </div>
         </div>
       </motion.div>
 
-      {/* Related products */}
       {related.length > 0 && (
         <section className="mt-20">
           <h2 className="mb-6 text-2xl font-bold text-foreground">Productos relacionados</h2>

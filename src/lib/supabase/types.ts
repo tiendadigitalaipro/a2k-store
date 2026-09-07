@@ -315,6 +315,7 @@ export interface OrderStatusHistory {
 export interface PaymentMethod {
   id: string
   name: string
+  slug?: string | null
   type: PaymentMethodType
   currency: string
   is_active: boolean

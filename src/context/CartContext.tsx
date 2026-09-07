@@ -123,7 +123,13 @@ export function CartProvider({ children }: CartProviderProps) {
   )
 
   const subtotal = useMemo(
-    () => state.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
+    () =>
+      state.items.reduce((sum, item) => {
+        const price = item.variantId
+          ? item.product.variants?.find((v) => v.id === item.variantId)?.price ?? item.product.price
+          : item.product.price
+        return sum + price * item.quantity
+      }, 0),
     [state.items],
   )
 

@@ -154,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const client = supabase()
       if (!client) return { error: 'Supabase not configured' }
 
-      const { data, error } = await client.auth.signUp({
+      const { error } = await client.auth.signUp({
         email: params.email,
         password: params.password,
         options: {
@@ -167,15 +167,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error) return { error: error.message }
 
-      // If user was created, create customer record
-      if (data.user) {
-        // The profile is created by a database trigger (see below)
-        // The customer record is created here
-        await client.from('customers').insert({
-          profile_id: data.user.id,
-          whatsapp: params.whatsapp,
-        })
-      }
+      // Profile and customer records are created automatically by the
+      // handle_new_user trigger in supabase/migrations/00013_security_hardening.sql.
+      // No manual INSERT is needed here.
 
       return { error: null }
     },
