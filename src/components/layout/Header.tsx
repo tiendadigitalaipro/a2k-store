@@ -15,7 +15,8 @@ const links = [
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'superadmin'
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border glass">
@@ -57,10 +58,19 @@ export function Header() {
           <div className="flex items-center gap-2">
             <CartBadge />
 
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="hidden rounded-lg border border-primary/40 bg-primary/10 px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/20 md:block"
+              >
+                Panel
+              </Link>
+            )}
+
             {user ? (
               <Link
                 to="/mi-cuenta"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface-elevated text-muted transition-colors hover:border-primary/40 hover:text-foreground"
                 aria-label="Mi cuenta"
               >
                 <Icon name="user" size={18} />

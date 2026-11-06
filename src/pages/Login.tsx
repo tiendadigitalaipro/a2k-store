@@ -1,14 +1,24 @@
 /**
- * Login Page
+ * Login Page (Fase 19 — rediseño A2K)
+ *
+ * Dark/gold luxury theme, Google OAuth and email/password.
+ * Supports ?next=/ruta to return the user where he was heading.
  */
 
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import { AuthShell } from '@/components/auth/AuthShell'
+import { GoogleButton } from '@/components/auth/GoogleButton'
+import { Input } from '@/components/ui/Input'
 
 export default function Login() {
   const { signIn } = useAuth()
   const navigate = useNavigate()
+  const [params] = useSearchParams()
+
+  const next = params.get('next')
+  const safeNext = next && next.startsWith('/') && !next.startsWith('//') ? next : '/'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -20,97 +30,91 @@ export default function Login() {
     setError(null)
     setLoading(true)
 
-    const { error: signInError } = await signIn(email, password)
+    const { error: signInError } = await signIn(email.trim(), password)
 
     if (signInError) {
-      setError(signInError)
+      setError(
+        signInError.toLowerCase().includes('invalid login')
+          ? 'Correo o contraseña incorrectos.'
+          : signInError.toLowerCase().includes('not confirmed')
+            ? 'Confirma tu correo antes de iniciar sesión.'
+            : signInError,
+      )
       setLoading(false)
       return
     }
 
-    navigate('/')
+    navigate(safeNext)
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <div className="text-center mb-8">
-            <Link to="/" className="text-2xl font-bold text-gray-900">
-              A2K Store
-            </Link>
-            <h1 className="mt-4 text-xl font-semibold text-gray-900">
-              Iniciar sesión
-            </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Accede a tu cuenta para ver tus pedidos
-            </p>
-          </div>
-
-          {error && (
-            <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-colors"
-                placeholder="tu@email.com"
-              />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Contraseña
-                </label>
-                <Link
-                  to="/recuperar-password"
-                  className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
-                >
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-colors"
-                placeholder="••••••••"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? 'Ingresando...' : 'Iniciar sesión'}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-gray-500">
-            ¿No tienes cuenta?{' '}
-            <Link to="/registro" className="font-medium text-gray-900 hover:underline">
-              Regístrate
-            </Link>
-          </p>
+    <AuthShell
+      title="Iniciar sesión"
+      subtitle="Accede a tu cuenta para comprar y ver tus pedidos"
+    >
+      {error && (
+        <div className="mb-5 rounded-xl border border-danger/25 bg-danger/10 p-3 text-sm text-danger">
+          {error}
         </div>
+      )}
+
+      <GoogleButton redirectTo={safeNext !== '/' ? `/auth/callback?next=${encodeURIComponent(safeNext)}` : undefined} />
+
+      <div className="my-6 flex items-center gap-3" aria-hidden="true">
+        <span className="h-px flex-1 bg-border" />
+        <span className="text-[11px] uppercase tracking-widest text-muted-foreground">o con tu correo</span>
+        <span className="h-px flex-1 bg-border" />
       </div>
-    </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          id="email"
+          type="email"
+          label="Correo electrónico"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+          placeholder="tucorreo@gmail.com"
+        />
+        <div>
+          <div className="mb-1.5 flex items-center justify-between">
+            <label htmlFor="password" className="block text-sm font-medium text-muted-foreground">
+              Contraseña
+            </label>
+            <Link
+              to="/recuperar-password"
+              className="text-xs font-medium text-primary transition-colors hover:text-accent"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
+          <Input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+            placeholder="••••••••"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-[0_0_24px_-8px_rgba(197,160,89,0.55)] transition-all duration-200 hover:bg-primary-hover active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {loading ? 'Entrando…' : 'Entrar'}
+        </button>
+      </form>
+
+      <p className="mt-6 text-center text-sm text-muted">
+        ¿No tienes cuenta?{' '}
+        <Link to="/registro" className="font-semibold text-primary hover:text-accent">
+          Regístrate gratis
+        </Link>
+      </p>
+    </AuthShell>
   )
 }

@@ -1,17 +1,24 @@
 /**
- * Register Page
+ * Register Page (Fase 19 — rediseño A2K)
+ *
+ * Dark/gold theme, Google OAuth + registro por correo con WhatsApp.
+ * El trigger handle_new_user crea perfil + cliente automáticamente.
  */
 
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import { AuthShell } from '@/components/auth/AuthShell'
+import { GoogleButton } from '@/components/auth/GoogleButton'
+import { Input } from '@/components/ui/Input'
 
 export default function Register() {
   const { signUp } = useAuth()
+  const navigate = useNavigate()
 
   const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -23,186 +30,155 @@ export default function Register() {
     setError(null)
 
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden')
+      setError('Las contraseñas no coinciden.')
       return
     }
-
     if (password.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres')
+      setError('La contraseña debe tener al menos 8 caracteres.')
       return
     }
 
     setLoading(true)
-
     const { error: signUpError } = await signUp({
-      email,
+      email: email.trim(),
       password,
-      fullName,
-      whatsapp,
+      fullName: fullName.trim(),
+      whatsapp: whatsapp.trim(),
     })
 
     if (signUpError) {
-      setError(signUpError)
+      setError(
+        signUpError.toLowerCase().includes('already registered')
+          ? 'Ese correo ya está registrado. Inicia sesión o recupera tu contraseña.'
+          : signUpError,
+      )
       setLoading(false)
       return
     }
 
     setSuccess(true)
+    setLoading(false)
   }
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-              <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              ¡Cuenta creada!
-            </h2>
-            <p className="text-sm text-gray-500 mb-6">
-              Revisa tu email para verificar tu cuenta. Si no lo encuentras, revisa la carpeta de spam.
-            </p>
-            <Link
-              to="/login"
-              className="inline-block py-3 px-6 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
-            >
-              Ir a iniciar sesión
-            </Link>
+      <AuthShell
+        title="¡Cuenta creada!"
+        subtitle="Ya casi estás listo para comprar"
+      >
+        <div className="space-y-5 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-primary/40 bg-primary/15">
+            <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
           </div>
+          <p className="text-sm text-muted">
+            Te enviamos un correo de confirmación a <strong className="text-foreground">{email}</strong>.
+            Confírmalo y luego inicia sesión.
+          </p>
+          <button
+            onClick={() => navigate('/login')}
+            className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+          >
+            Ir a iniciar sesión
+          </button>
         </div>
-      </div>
+      </AuthShell>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <div className="text-center mb-8">
-            <Link to="/" className="text-2xl font-bold text-gray-900">
-              A2K Store
-            </Link>
-            <h1 className="mt-4 text-xl font-semibold text-gray-900">
-              Crear cuenta
-            </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Regístrate para realizar pedidos
-            </p>
-          </div>
-
-          {error && (
-            <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
-                Nombre completo
-              </label>
-              <input
-                id="fullName"
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-                autoComplete="name"
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-colors"
-                placeholder="Tu nombre"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-colors"
-                placeholder="tu@email.com"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="whatsapp" className="block text-sm font-medium text-gray-700 mb-1">
-                WhatsApp
-              </label>
-              <input
-                id="whatsapp"
-                type="tel"
-                value={whatsapp}
-                onChange={(e) => setWhatsapp(e.target.value)}
-                required
-                autoComplete="tel"
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-colors"
-                placeholder="584164117331"
-              />
-              <p className="mt-1 text-xs text-gray-400">
-                Formato internacional sin + (ej: 584164117331)
-              </p>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Contraseña
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="new-password"
-                minLength={8}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-colors"
-                placeholder="Mínimo 8 caracteres"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                Confirmar contraseña
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                autoComplete="new-password"
-                minLength={8}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-colors"
-                placeholder="Repite tu contraseña"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? 'Creando cuenta...' : 'Crear cuenta'}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-gray-500">
-            ¿Ya tienes cuenta?{' '}
-            <Link to="/login" className="font-medium text-gray-900 hover:underline">
-              Iniciar sesión
-            </Link>
-          </p>
+    <AuthShell
+      title="Crear cuenta"
+      subtitle="Regístrate para comprar con despacho a todo Venezuela"
+    >
+      {error && (
+        <div className="mb-5 rounded-xl border border-danger/25 bg-danger/10 p-3 text-sm text-danger">
+          {error}
         </div>
+      )}
+
+      <GoogleButton label="Registrarme con Google" />
+
+      <div className="my-6 flex items-center gap-3" aria-hidden="true">
+        <span className="h-px flex-1 bg-border" />
+        <span className="text-[11px] uppercase tracking-widest text-muted-foreground">o regístrate con correo</span>
+        <span className="h-px flex-1 bg-border" />
       </div>
-    </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          id="fullName"
+          label="Nombre completo"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          required
+          autoComplete="name"
+          placeholder="Tu nombre y apellido"
+        />
+        <Input
+          id="whatsapp"
+          label="WhatsApp de contacto"
+          type="tel"
+          value={whatsapp}
+          onChange={(e) => setWhatsapp(e.target.value)}
+          required
+          autoComplete="tel"
+          inputMode="numeric"
+          pattern="[0-9]{10,15}"
+          title="Solo números, código de área incluido (ej. 584161234567)"
+          placeholder="584161234567"
+        />
+        <Input
+          id="email"
+          type="email"
+          label="Correo electrónico"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+          placeholder="tucorreo@gmail.com"
+        />
+        <div className="grid grid-cols-2 gap-3">
+          <Input
+            id="password"
+            type="password"
+            label="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="new-password"
+            minLength={8}
+            placeholder="Mínimo 8 caracteres"
+          />
+          <Input
+            id="confirmPassword"
+            type="password"
+            label="Repetir"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            autoComplete="new-password"
+            minLength={8}
+            placeholder="Repite la clave"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-[0_0_24px_-8px_rgba(197,160,89,0.55)] transition-all duration-200 hover:bg-primary-hover active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {loading ? 'Creando cuenta…' : 'Crear mi cuenta'}
+        </button>
+      </form>
+
+      <p className="mt-6 text-center text-sm text-muted">
+        ¿Ya tienes cuenta?{' '}
+        <Link to="/login" className="font-semibold text-primary hover:text-accent">
+          Inicia sesión
+        </Link>
+      </p>
+    </AuthShell>
   )
 }

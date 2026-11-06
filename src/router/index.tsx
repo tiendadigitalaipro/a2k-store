@@ -8,10 +8,15 @@ import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import ForgotPassword from '@/pages/ForgotPassword'
 import ResetPassword from '@/pages/ResetPassword'
+import AuthCallback from '@/pages/AuthCallback'
 import Account from '@/pages/Account'
 import Checkout from '@/pages/Checkout'
 import CheckoutConfirmation from '@/pages/CheckoutConfirmation'
 import NotFound from '@/pages/NotFound'
+import { AdminLayout } from '@/pages/admin/AdminLayout'
+import AdminDashboard from '@/pages/admin/AdminDashboard'
+import AdminProducts from '@/pages/admin/AdminProducts'
+import AdminOrders from '@/pages/admin/AdminOrders'
 
 export function AppRouter() {
   return (
@@ -58,6 +63,21 @@ export function AppRouter() {
       <Route path="registro" element={<Register />} />
       <Route path="recuperar-password" element={<ForgotPassword />} />
       <Route path="reset-password" element={<ResetPassword />} />
+      <Route path="auth/callback" element={<AuthCallback />} />
+
+      {/* Admin (Fase 19): rol admin/superadmin, respaldado por RLS */}
+      <Route
+        path="admin"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<AdminDashboard />} />
+        <Route path="productos" element={<AdminProducts />} />
+        <Route path="pedidos" element={<AdminOrders />} />
+      </Route>
     </Routes>
   )
 }

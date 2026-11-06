@@ -3,11 +3,16 @@ import { cn } from '@/lib/utils'
 
 export type IconName =
   | 'arrow-right'
+  | 'arrow-left'
   | 'cart'
+  | 'check'
   | 'chevron-right'
   | 'close'
+  | 'dashboard'
+  | 'edit'
   | 'filter'
   | 'heart'
+  | 'image'
   | 'menu'
   | 'minus'
   | 'package'
@@ -15,7 +20,9 @@ export type IconName =
   | 'search'
   | 'star'
   | 'trash'
+  | 'upload'
   | 'user'
+  | 'wallet'
 
 interface IconProps extends SVGAttributes<SVGSVGElement> {
   name: IconName
@@ -27,6 +34,36 @@ const icons: Record<IconName, ReactNode> = {
     <>
       <path d="M5 12h14" />
       <path d="m12 5 7 7-7 7" />
+    </>
+  ),
+  'arrow-left': (
+    <>
+      <path d="M19 12H5" />
+      <path d="m12 19-7-7 7-7" />
+    </>
+  ),
+  check: (
+    <path d="M20 6 9 17l-5-5" />
+  ),
+  dashboard: (
+    <>
+      <rect x="3" y="3" width="7" height="9" rx="1" />
+      <rect x="14" y="3" width="7" height="5" rx="1" />
+      <rect x="14" y="12" width="7" height="9" rx="1" />
+      <rect x="3" y="16" width="7" height="5" rx="1" />
+    </>
+  ),
+  edit: (
+    <>
+      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+      <path d="m15 5 4 4" />
+    </>
+  ),
+  image: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <circle cx="9" cy="9" r="2" />
+      <path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21" />
     </>
   ),
   cart: (
@@ -91,10 +128,24 @@ const icons: Record<IconName, ReactNode> = {
       <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
     </>
   ),
+  upload: (
+    <>
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <path d="M12 3v12" />
+    </>
+  ),
   user: (
     <>
       <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
+    </>
+  ),
+  wallet: (
+    <>
+      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
     </>
   ),
 }

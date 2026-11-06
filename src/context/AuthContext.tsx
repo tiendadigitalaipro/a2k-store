@@ -41,6 +41,7 @@ interface AuthState {
 
 interface AuthContextType extends AuthState {
   signIn: (email: string, password: string) => Promise<{ error: string | null }>
+  signInWithGoogle: (redirectTo?: string) => Promise<{ error: string | null }>
   signUp: (params: {
     email: string
     password: string
@@ -149,6 +150,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null }
   }, [])
 
+  /**
+   * Google OAuth (Fase 19). The profile + customer records are created by the
+   * handle_new_user trigger when Google returns the user for the first time.
+   */
+  const signInWithGoogle = useCallback(async (redirectTo?: string) => {
+    const client = supabase()
+    if (!client) return { error: 'Supabase not configured' }
+
+    const { error } = await client.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectTo ?? `${window.location.origin}/auth/callback`,
+        queryParams: { prompt: 'select_account' },
+      },
+    })
+    return { error: error?.message ?? null }
+  }, [])
+
   const signUp = useCallback(
     async (params: { email: string; password: string; fullName: string; whatsapp: string }) => {
       const client = supabase()
@@ -210,6 +229,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextType = {
     ...state,
     signIn,
+    signInWithGoogle,
     signUp,
     signOut,
     resetPassword,

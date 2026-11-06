@@ -1,51 +1,51 @@
 /**
- * Reset Password Page
+ * Reset Password Page (Fase 19 — rediseño A2K)
  *
- * Handles the password reset flow after the user clicks the recovery link
- * sent by Supabase Auth. The link redirects to /reset-password with an
- * access token in the URL hash. Supabase client automatically consumes the
- * token and emits a PASSWORD_RECOVERY event.
+ * El enlace del correo llega a /reset-password (redirectTo del Forgot).
+ * Con PKCE + detectSessionInUrl el cliente establece la sesión de
+ * recuperación y emite PASSWORD_RECOVERY; aquí se define la clave nueva.
  */
 
 import { useState, useEffect, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
+import { AuthShell } from '@/components/auth/AuthShell'
+import { Input } from '@/components/ui/Input'
 
 export default function ResetPassword() {
+  const navigate = useNavigate()
+
+  const [ready, setReady] = useState(false)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [ready, setReady] = useState(false)
 
   useEffect(() => {
     const client = supabase()
     if (!client) {
-      setError('Supabase not configured')
+      setError('Supabase no está configurado en este despliegue.')
       return
     }
 
-    // The Supabase client automatically consumes the access_token from the
-    // URL hash and establishes a session. We listen for the PASSWORD_RECOVERY
-    // event to confirm we are in the correct state.
-    const {
-      data: { subscription },
-    } = client.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
+    // La sesión de recuperación puede tardar unos ms en establecerse.
+    let elapsed = 0
+    const timer = window.setInterval(async () => {
+      elapsed += 400
+      const { data } = await client.auth.getSession()
+      if (data.session) {
+        window.clearInterval(timer)
         setReady(true)
+        return
       }
-    })
-
-    // If the token was already processed before this listener was attached,
-    // getSession() will return the active recovery session.
-    client.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setReady(true)
+      if (elapsed > 5000) {
+        window.clearInterval(timer)
+        setError('Este enlace es inválido o ya expiró. Solicita uno nuevo.')
       }
-    })
+    }, 400)
 
-    return () => subscription.unsubscribe()
+    return () => window.clearInterval(timer)
   }, [])
 
   const handleSubmit = async (e: FormEvent) => {
@@ -53,26 +53,23 @@ export default function ResetPassword() {
     setError(null)
 
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden')
+      setError('Las contraseñas no coinciden.')
       return
     }
-
     if (password.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres')
+      setError('La contraseña debe tener al menos 8 caracteres.')
       return
     }
 
     setLoading(true)
-
     const client = supabase()
     if (!client) {
-      setError('Supabase not configured')
+      setError('Supabase no está configurado.')
       setLoading(false)
       return
     }
 
     const { error: updateError } = await client.auth.updateUser({ password })
-
     if (updateError) {
       setError(updateError.message)
       setLoading(false)
@@ -80,117 +77,96 @@ export default function ResetPassword() {
     }
 
     setSuccess(true)
+    setLoading(false)
   }
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-              <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+      <AuthShell title="Contraseña actualizada" subtitle="Tu clave quedó lista">
+        <div className="space-y-5 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-primary/40 bg-primary/15">
+            <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p className="text-sm text-muted">
+            Ya puedes iniciar sesión con tu correo y tu nueva contraseña.
+          </p>
+          <button
+            onClick={() => navigate('/login')}
+            className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+          >
+            Iniciar sesión
+          </button>
+        </div>
+      </AuthShell>
+    )
+  }
+
+  if (!ready) {
+    return (
+      <AuthShell title="Restablecer contraseña" subtitle="Validando tu enlace seguro…">
+        {error ? (
+          <div className="space-y-5 text-center">
+            <div className="rounded-xl border border-danger/25 bg-danger/10 p-4 text-sm text-danger">
+              {error}
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              Contraseña actualizada
-            </h2>
-            <p className="text-sm text-gray-500 mb-6">
-              Tu contraseña se ha restablecido correctamente. Ahora puedes iniciar sesión.
-            </p>
             <Link
-              to="/login"
-              className="inline-block py-3 px-6 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+              to="/recuperar-password"
+              className="inline-block rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
             >
-              Iniciar sesión
+              Solicitar un enlace nuevo
             </Link>
           </div>
-        </div>
-      </div>
+        ) : (
+          <div className="flex flex-col items-center gap-4 py-6">
+            <span className="h-8 w-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary" aria-hidden="true" />
+            <p className="text-sm text-muted">Un momento…</p>
+          </div>
+        )}
+      </AuthShell>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <div className="text-center mb-8">
-            <Link to="/" className="text-2xl font-bold text-gray-900">
-              A2K Store
-            </Link>
-            <h1 className="mt-4 text-xl font-semibold text-gray-900">
-              Restablecer contraseña
-            </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Ingresa tu nueva contraseña
-            </p>
-          </div>
-
-          {error && (
-            <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
-              {error}
-            </div>
-          )}
-
-          {!ready && !error && (
-            <div className="mb-6 p-3 rounded-lg bg-blue-50 border border-blue-200 text-sm text-blue-700">
-              Verificando enlace de recuperación...
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Nueva contraseña
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="new-password"
-                minLength={8}
-                disabled={!ready}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-colors disabled:opacity-50"
-                placeholder="Mínimo 8 caracteres"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                Confirmar contraseña
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                autoComplete="new-password"
-                minLength={8}
-                disabled={!ready}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-colors disabled:opacity-50"
-                placeholder="Repite tu contraseña"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading || !ready}
-              className="w-full py-3 px-4 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? 'Actualizando...' : 'Restablecer contraseña'}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-gray-500">
-            <Link to="/login" className="font-medium text-gray-900 hover:underline">
-              ← Volver al login
-            </Link>
-          </p>
+    <AuthShell title="Nueva contraseña" subtitle="Crea una clave nueva para tu cuenta">
+      {error && (
+        <div className="mb-5 rounded-xl border border-danger/25 bg-danger/10 p-3 text-sm text-danger">
+          {error}
         </div>
-      </div>
-    </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          id="newPassword"
+          type="password"
+          label="Contraseña nueva"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          autoComplete="new-password"
+          minLength={8}
+          placeholder="Mínimo 8 caracteres"
+        />
+        <Input
+          id="confirmNewPassword"
+          type="password"
+          label="Repetir contraseña"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          autoComplete="new-password"
+          minLength={8}
+          placeholder="Repite la clave"
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-[0_0_24px_-8px_rgba(197,160,89,0.55)] transition-all duration-200 hover:bg-primary-hover active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {loading ? 'Guardando…' : 'Guardar contraseña'}
+        </button>
+      </form>
+    </AuthShell>
   )
 }

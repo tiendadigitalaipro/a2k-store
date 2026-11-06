@@ -28,7 +28,15 @@ export function supabase(): SupabaseClient<any, 'public', any> | null {
   }
 
   if (!_client) {
-    _client = createClient(supabaseUrl, supabaseAnonKey)
+    _client = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        // PKCE flow: required for Google OAuth and recommended by Supabase.
+        flowType: 'pkce',
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+      },
+    })
   }
 
   return _client

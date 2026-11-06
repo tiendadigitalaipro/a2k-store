@@ -1,13 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Lato:wght@300;400;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  /* Background & Surfaces */
-  --color-background: #0a0a0f;
-  --color-foreground: #f8fafc;
-  --color-surface: #13131a;
-  --color-surface-elevated: #1c1c27;
-  --color-surface-hover: #252536;
+  /* Background & Surfaces — A2K luxury black */
+  --color-background: #0b0b0e;
+  --color-foreground: #f5f2ea;
+  --color-surface: #121216;
+  --color-surface-elevated: #1a1a20;
+  --color-surface-hover: #232330;
 
   /* Muted */
   --color-muted: #94a3b8;
@@ -17,24 +17,26 @@
   --color-border: rgba(255, 255, 255, 0.08);
   --color-border-strong: rgba(255, 255, 255, 0.14);
 
-  /* Primary: Indigo */
-  --color-primary: #6366f1;
-  --color-primary-hover: #818cf8;
-  --color-primary-foreground: #ffffff;
-  --color-primary-subtle: rgba(99, 102, 241, 0.12);
+  /* Primary: A2K Gold */
+  --color-primary: #C5A059;
+  --color-primary-hover: #d9b878;
+  --color-primary-foreground: #17130a;
+  --color-primary-subtle: rgba(197, 160, 89, 0.14);
 
-  /* Accent: Cyan */
-  --color-accent: #22d3ee;
-  --color-accent-hover: #67e8f9;
-  --color-accent-foreground: #0f172a;
+  /* Accent: Champagne Gold */
+  --color-accent: #E7C27D;
+  --color-accent-hover: #f2d69c;
+  --color-accent-foreground: #17130a;
 
   /* Functional */
   --color-success: #34d399;
   --color-warning: #fbbf24;
   --color-danger: #f87171;
 
-  /* Typography */
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Typography — A2K brand: Cinzel display, Montserrat UI, Lato texto */
+  --font-sans: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Cinzel', 'Montserrat', serif;
+  --font-body: 'Lato', 'Montserrat', system-ui, sans-serif;
 
   /* Radius */
   --radius-sm: 0.5rem;
@@ -60,11 +62,16 @@ html {
 body {
   margin: 0;
   min-height: 100dvh;
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   background-color: var(--color-background);
   color: var(--color-foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
 }
 
 img,
@@ -101,12 +108,19 @@ button {
   }
 
   .gradient-radial {
-    background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.18), transparent 45%);
+    background: radial-gradient(circle at 50% 0%, rgba(197, 160, 89, 0.16), transparent 45%);
   }
 
   .glass {
-    background: rgba(19, 19, 26, 0.72);
+    background: rgba(11, 11, 14, 0.72);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+  }
+
+  .text-gold-gradient {
+    background: linear-gradient(120deg, #E7C27D 0%, #C5A059 55%, #E7C27D 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 }
