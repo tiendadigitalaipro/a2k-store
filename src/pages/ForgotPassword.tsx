@@ -12,8 +12,10 @@ import { useAuth } from '@/context/AuthContext'
 import { AuthShell } from '@/components/auth/AuthShell'
 import { Input } from '@/components/ui/Input'
 import { SITE } from '@/config/site'
+import { useNoIndex } from '@/lib/seo'
 
 export default function ForgotPassword() {
+  useNoIndex('Recuperar contraseña')
   const { resetPassword } = useAuth()
 
   const [email, setEmail] = useState('')

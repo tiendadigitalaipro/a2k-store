@@ -4,6 +4,10 @@ export interface Category {
   name: string
   description: string
   imageUrl?: string
+  /** Título SEO desde la base de datos (columna seo_title). */
+  seoTitle?: string
+  /** Descripción SEO desde la base de datos (columna seo_description). */
+  seoDescription?: string
 }
 
 export interface ProductVariant {
@@ -20,6 +24,10 @@ export interface Product {
   name: string
   description: string
   shortDescription: string
+  /** Título SEO desde la base de datos (columna seo_title). */
+  seoTitle?: string
+  /** Descripción SEO desde la base de datos (columna seo_description). */
+  seoDescription?: string
   price: number
   compareAtPrice?: number
   currency: string

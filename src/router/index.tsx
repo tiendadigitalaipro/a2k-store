@@ -25,6 +25,8 @@ export function AppRouter() {
       <Route element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="catalogo" element={<Catalog />} />
+        {/* Página de categoría con URL propia (Fase 20 SEO): /categoria/:slug */}
+        <Route path="categoria/:slug" element={<Catalog />} />
         <Route path="producto/:slug" element={<ProductDetail />} />
 
         {/* Protected routes */}

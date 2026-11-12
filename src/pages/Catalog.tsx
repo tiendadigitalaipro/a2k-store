@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Container } from '@/components/ui/Container'
 import { Badge } from '@/components/ui/Badge'
@@ -8,6 +8,13 @@ import { Icon } from '@/components/ui/Icon'
 import { ProductGrid } from '@/components/product/ProductGrid'
 import { getActiveProducts } from '@/services/products'
 import { getActiveCategories } from '@/services/categories'
+import { SITE } from '@/config/site'
+import {
+  useSEO,
+  breadcrumbJsonLd,
+  itemListJsonLd,
+  truncate,
+} from '@/lib/seo'
 import type { Product, Category } from '@/types'
 
 type SortOption = 'relevance' | 'price-asc' | 'price-desc' | 'newest' | 'rating'
@@ -30,8 +37,11 @@ function sortProducts(items: Product[], sort: SortOption): Product[] {
 }
 
 export default function Catalog() {
+  // La misma página sirve /catalogo (con filtros por query) y /categoria/:slug (URL propia, Fase 20 SEO).
+  const routeParams = useParams<{ slug?: string }>()
+  const routeSlug = routeParams.slug
   const [searchParams, setSearchParams] = useSearchParams()
-  const categorySlug = searchParams.get('categoria') ?? undefined
+  const categorySlug = routeSlug ?? searchParams.get('categoria') ?? undefined
   const query = searchParams.get('q') ?? ''
   const sort = (searchParams.get('sort') as SortOption) ?? 'relevance'
   const featuredOnly = searchParams.get('featured') === 'true'
@@ -123,6 +133,48 @@ export default function Catalog() {
     [filteredProducts, sort],
   )
 
+  // SEO (Fase 20): título/descripción únicos por categoría + JSON-LD ItemList y Breadcrumb.
+  const activeCategory = useMemo(
+    () => categories.find((c) => c.slug === categorySlug),
+    [categories, categorySlug],
+  )
+  const seoTitle = activeCategory
+    ? activeCategory.seoTitle ?? `${activeCategory.name} — Comprar online en Venezuela`
+    : query
+      ? `Resultados para “${query}”`
+      : 'Catálogo completo — Tecnología, hogar y más'
+  const seoDescription = activeCategory
+    ? activeCategory.seoDescription ??
+      truncate(
+        `${activeCategory.name}: ${activeCategory.description} Productos disponibles en ${SITE.name} con atención por WhatsApp y envío nacional.`,
+        158,
+      )
+    : 'Explora el catálogo completo de A2K Store: calzados, electrónica, hogar, ropa deportiva, repuestos y ropa para niños con envío nacional.'
+  const seoJsonLd = useMemo(() => {
+    const jsonLd: ReturnType<typeof breadcrumbJsonLd>[] = []
+    const crumbs = [{ name: 'Inicio', path: '/' }]
+    if (activeCategory) {
+      crumbs.push({ name: activeCategory.name, path: `/categoria/${activeCategory.slug}` })
+      jsonLd.push(breadcrumbJsonLd(crumbs))
+      if (sortedProducts.length > 0) {
+        jsonLd.push(
+          itemListJsonLd(
+            sortedProducts.slice(0, 20).map((p) => ({ name: p.name, slug: p.slug })),
+            activeCategory.name,
+          ),
+        )
+      }
+    }
+    return jsonLd
+  }, [activeCategory, sortedProducts])
+
+  useSEO({
+    title: seoTitle,
+    description: seoDescription,
+    path: activeCategory ? `/categoria/${activeCategory.slug}` : '/catalogo',
+    jsonLd: seoJsonLd,
+  })
+
   const setParam = (key: string, value: string | undefined) => {
     const next = new URLSearchParams(searchParams)
     if (value) {
@@ -133,7 +185,6 @@ export default function Catalog() {
     setSearchParams(next, { replace: true })
   }
 
-  const setCategory = (slug: string | undefined) => setParam('categoria', slug)
   const setQuery = (value: string) => setParam('q', value || undefined)
   const setSort = (value: SortOption) => setParam('sort', value === 'relevance' ? undefined : value)
   const toggleParam = (key: string) => {
@@ -173,13 +224,15 @@ export default function Catalog() {
         className="mb-10"
       >
         <Badge variant="primary" className="mb-4">
-          Catálogo
+          {activeCategory ? activeCategory.name : 'Catálogo'}
         </Badge>
         <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-          Todos los productos
+          {activeCategory ? activeCategory.name : 'Todos los productos'}
         </h1>
         <p className="mt-2 max-w-2xl text-muted">
-          Explora nuestra selección de tecnología, audio, wearables y accesorios premium.
+          {activeCategory
+            ? activeCategory.description
+            : 'Explora nuestra selección de calzados, electrónica, hogar, ropa deportiva, repuestos y ropa para niños.'}
         </p>
       </motion.div>
 
@@ -191,10 +244,10 @@ export default function Catalog() {
 
       {/* Filters bar */}
       <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        {/* Category pills */}
+        {/* Category pills — enlaces <a> rastreables por Google (Fase 20 SEO) */}
         <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setCategory(undefined)}
+          <Link
+            to="/catalogo"
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               !categorySlug
                 ? 'bg-primary text-primary-foreground'
@@ -202,11 +255,11 @@ export default function Catalog() {
             }`}
           >
             Todos
-          </button>
+          </Link>
           {categories.map((category) => (
-            <button
+            <Link
               key={category.id}
-              onClick={() => setCategory(category.slug)}
+              to={`/categoria/${category.slug}`}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                 categorySlug === category.slug
                   ? 'bg-primary text-primary-foreground'
@@ -214,7 +267,7 @@ export default function Catalog() {
               }`}
             >
               {category.name}
-            </button>
+            </Link>
           ))}
         </div>
 

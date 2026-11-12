@@ -3,8 +3,10 @@ import { motion } from 'framer-motion'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
+import { useNoIndex } from '@/lib/seo'
 
 export default function NotFound() {
+  useNoIndex('Página no encontrada')
   return (
     <Container className="flex flex-col items-center justify-center py-32 text-center">
       <motion.div

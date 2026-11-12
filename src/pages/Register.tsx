@@ -11,8 +11,10 @@ import { useAuth } from '@/context/AuthContext'
 import { AuthShell } from '@/components/auth/AuthShell'
 import { GoogleButton } from '@/components/auth/GoogleButton'
 import { Input } from '@/components/ui/Input'
+import { useNoIndex } from '@/lib/seo'
 
 export default function Register() {
+  useNoIndex('Crear cuenta')
   const { signUp } = useAuth()
   const navigate = useNavigate()
 

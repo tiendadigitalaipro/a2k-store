@@ -14,6 +14,7 @@ import { supabase } from '@/lib/supabase'
 import { getCustomerOrders } from '@/services/orders'
 import { formatPrice } from '@/lib/format'
 import type { Order, OrderStatus } from '@/lib/supabase/types'
+import { useNoIndex } from '@/lib/seo'
 
 const statusLabels: Record<OrderStatus, string> = {
   pending_payment: 'Pendiente de pago',
@@ -51,6 +52,7 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 }
 
 export default function Account() {
+  useNoIndex('Mi cuenta')
   const { user, profile, customer, signOut } = useAuth()
 
   const [orders, setOrders] = useState<Order[]>([])

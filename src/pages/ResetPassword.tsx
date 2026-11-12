@@ -11,8 +11,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { AuthShell } from '@/components/auth/AuthShell'
 import { Input } from '@/components/ui/Input'
+import { useNoIndex } from '@/lib/seo'
 
 export default function ResetPassword() {
+  useNoIndex('Nueva contraseña')
   const navigate = useNavigate()
 
   const [ready, setReady] = useState(false)

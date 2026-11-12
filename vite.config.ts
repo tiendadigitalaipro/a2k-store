@@ -10,4 +10,16 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    // Fase 20 SEO/velocidad: separa librerías grandes en chunks propios para
+    // que el navegador las cache y el código de la tienda cargue antes.
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'motion': ['framer-motion'],
+        },
+      },
+    },
+  },
 })

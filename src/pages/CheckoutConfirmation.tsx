@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { formatPrice } from '@/lib/format'
 import { SITE } from '@/config/site'
+import { useNoIndex } from '@/lib/seo'
 
 interface PaymentMethodSummary {
   id: string
@@ -28,6 +29,7 @@ interface CheckoutState {
 }
 
 export default function CheckoutConfirmation() {
+  useNoIndex('Pedido confirmado')
   const location = useLocation()
   const navigate = useNavigate()
 

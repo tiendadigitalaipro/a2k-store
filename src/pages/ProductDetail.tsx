@@ -9,9 +9,15 @@ import { ProductImage } from '@/components/product/ProductImage'
 import { ProductPrice } from '@/components/product/ProductPrice'
 import { ProductBadges } from '@/components/product/ProductBadge'
 import { AddToCartButton } from '@/components/cart/AddToCartButton'
-import { getProductBySlug } from '@/services/products'
-import { getFeaturedProducts } from '@/services/products'
+import { getProductBySlug, getRelatedProducts } from '@/services/products'
 import { calculateDiscount } from '@/lib/format'
+import { SITE } from '@/config/site'
+import {
+  useSEO,
+  breadcrumbJsonLd,
+  productJsonLd,
+  truncate,
+} from '@/lib/seo'
 import type { Product, ProductVariant } from '@/types'
 
 export default function ProductDetail() {
@@ -53,9 +59,10 @@ export default function ProductDetail() {
       setSelectedVariant(data.variants?.[0] ?? null)
       setSelectedImageIndex(0)
 
-      const { data: featured } = await getFeaturedProducts(4)
-      if (!cancelled && featured) {
-        setRelated(featured.filter((p) => p.id !== data.id).slice(0, 3))
+      // Enlazado interno: relacionados de la misma categoría primero (Fase 20 SEO).
+      const { data: relatedProducts } = await getRelatedProducts(data.id, data.categorySlug, 4)
+      if (!cancelled && relatedProducts) {
+        setRelated(relatedProducts)
       }
 
       setLoading(false)
@@ -72,6 +79,53 @@ export default function ProductDetail() {
     const images = [product.imageUrl, ...(product.gallery ?? [])]
     return [...new Set(images)]
   }, [product])
+
+  // SEO (Fase 20): título/descripción únicos + JSON-LD Product y BreadcrumbList.
+  const seoDescription = product
+    ? product.seoDescription ??
+      truncate(product.shortDescription || product.description || SITE.description, 158)
+    : ''
+  const seoTitle = product
+    ? product.seoTitle ?? `${product.name} — ${product.categoryName ?? 'Tienda'} en Venezuela`
+    : loading
+      ? 'Cargando producto'
+      : 'Producto no encontrado'
+  const seoJsonLd = useMemo(() => {
+    if (!product) return []
+    const crumbs = [{ name: 'Inicio', path: '/' }]
+    if (product.categorySlug && product.categoryName) {
+      crumbs.push({ name: product.categoryName, path: `/categoria/${product.categorySlug}` })
+    }
+    crumbs.push({ name: product.name, path: `/producto/${product.slug}` })
+    return [
+      productJsonLd({
+        name: product.name,
+        slug: product.slug,
+        description: product.shortDescription || product.description,
+        imageUrl: product.imageUrl,
+        gallery: product.gallery,
+        sku: selectedVariant?.sku ?? product.sku,
+        price: selectedVariant?.price ?? product.price,
+        currency: product.currency,
+        categoryName: product.categoryName,
+        rating: product.rating,
+        reviewCount: product.reviewCount,
+        inStock: (selectedVariant?.stock ?? product.stock) > 0,
+      }),
+      breadcrumbJsonLd(crumbs),
+    ]
+  }, [product, selectedVariant])
+
+  useSEO({
+    title: seoTitle,
+    description: seoDescription || 'Producto disponible en A2K Store con envío nacional.',
+    path: product ? `/producto/${product.slug}` : '/',
+    type: 'product',
+    image: product?.imageUrl || undefined,
+    // Sin producto cargado (404 o cargando) la página NO se indexa.
+    robots: product ? 'index, follow' : 'noindex, nofollow',
+    jsonLd: seoJsonLd,
+  })
 
   if (loading) {
     return (
@@ -116,6 +170,26 @@ export default function ProductDetail() {
           Volver
         </Button>
 
+        {/* Migas de pan (Fase 20 SEO): navegación interna + coincide con BreadcrumbList JSON-LD */}
+        <nav aria-label="Ruta de navegación" className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-muted">
+          <Link to="/" className="transition-colors hover:text-primary">Inicio</Link>
+          <span aria-hidden="true">/</span>
+          <Link to="/catalogo" className="transition-colors hover:text-primary">Catálogo</Link>
+          {product.categorySlug && product.categoryName && (
+            <>
+              <span aria-hidden="true">/</span>
+              <Link
+                to={`/categoria/${product.categorySlug}`}
+                className="transition-colors hover:text-primary"
+              >
+                {product.categoryName}
+              </Link>
+            </>
+          )}
+          <span aria-hidden="true">/</span>
+          <span className="text-foreground" aria-current="page">{product.name}</span>
+        </nav>
+
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
           {/* Image gallery */}
           <div className="flex flex-col gap-4">
@@ -127,9 +201,10 @@ export default function ProductDetail() {
               />
               <ProductImage
                 src={gallery[selectedImageIndex] ?? product.imageUrl}
-                alt={`${product.name}${selectedVariant ? ` — ${selectedVariant.name}` : ''}`}
+                alt={`${product.name}${selectedVariant ? ` — ${selectedVariant.name}` : ''} — ${product.categoryName ?? 'producto'} | A2K Store`}
                 aspect="square"
                 className="rounded-2xl"
+                priority
               />
             </div>
 
@@ -257,9 +332,13 @@ export default function ProductDetail() {
       </motion.div>
 
       {related.length > 0 && (
-        <section className="mt-20">
-          <h2 className="mb-6 text-2xl font-bold text-foreground">Productos relacionados</h2>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="mt-20" aria-labelledby="titulo-relacionados">
+          <h2 id="titulo-relacionados" className="mb-6 text-2xl font-bold text-foreground">
+            {product.categorySlug && related.every((p) => p.categorySlug === product.categorySlug)
+              ? `Más de ${product.categoryName}`
+              : 'Productos relacionados'}
+          </h2>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((p, index) => (
               <motion.div
                 key={p.id}

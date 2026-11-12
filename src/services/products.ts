@@ -53,6 +53,8 @@ function mapProduct(product: DBProduct, ctx: MapContext): Product {
     name: product.name,
     description: product.description ?? '',
     shortDescription: product.short_description ?? '',
+    seoTitle: product.seo_title ?? undefined,
+    seoDescription: product.seo_description ?? undefined,
     price: Number(product.price),
     compareAtPrice: product.compare_at_price ? Number(product.compare_at_price) : undefined,
     currency: product.currency,
@@ -132,6 +134,35 @@ export async function getProductBySlug(
   }
 
   return { data: mapProduct(product, ctx), error: null }
+}
+
+/**
+ * Productos relacionados (Fase 20 SEO — enlazado interno).
+ * Prioriza productos de la MISMA categoría; si faltan, completa con destacados.
+ * Devuelve hasta `limit` productos excluyendo el actual.
+ */
+export async function getRelatedProducts(
+  currentProductId: string,
+  categorySlug?: string,
+  limit = 4,
+): Promise<{ data: Product[]; error: string | null }> {
+  const { data: all, error } = await getActiveProducts()
+  if (error) return { data: [], error }
+  if (!all || all.length === 0) return { data: [], error: null }
+
+  const others = all.filter((p) => p.id !== currentProductId)
+  const sameCategory = categorySlug
+    ? others.filter((p) => p.categorySlug === categorySlug)
+    : []
+  const featured = others.filter(
+    (p) => p.isFeatured && !sameCategory.some((s) => s.id === p.id),
+  )
+  const rest = others.filter(
+    (p) => !sameCategory.some((s) => s.id === p.id) && !featured.some((f) => f.id === p.id),
+  )
+
+  const related = [...sameCategory, ...featured, ...rest].slice(0, limit)
+  return { data: related, error: null }
 }
 
 export async function getFeaturedProducts(limit = 4): Promise<{

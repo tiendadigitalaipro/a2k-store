@@ -10,6 +10,7 @@ import { NavLink, Link, Outlet } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { cn } from '@/lib/utils'
+import { useNoIndex } from '@/lib/seo'
 
 const nav: { to: string; label: string; icon: IconName; end?: boolean }[] = [
   { to: '/admin', label: 'Resumen', icon: 'dashboard', end: true },
@@ -18,6 +19,7 @@ const nav: { to: string; label: string; icon: IconName; end?: boolean }[] = [
 ]
 
 export function AdminLayout() {
+  useNoIndex('Panel de administración')
   const { profile, signOut } = useAuth()
 
   return (

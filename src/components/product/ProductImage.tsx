@@ -6,6 +6,11 @@ interface ProductImageProps {
   alt: string
   className?: string
   aspect?: 'square' | 'portrait' | 'landscape'
+  /**
+   * Marcar como true SOLO en la imagen principal visible al abrir la página
+   * (LCP): carga eager con fetchpriority alta. El resto van con lazy-load.
+   */
+  priority?: boolean
 }
 
 const aspectClasses: Record<NonNullable<ProductImageProps['aspect']>, string> = {
@@ -14,7 +19,7 @@ const aspectClasses: Record<NonNullable<ProductImageProps['aspect']>, string> = 
   landscape: 'aspect-[4/3]',
 }
 
-export function ProductImage({ src, alt, className, aspect = 'square' }: ProductImageProps) {
+export function ProductImage({ src, alt, className, aspect = 'square', priority = false }: ProductImageProps) {
   const [loaded, setLoaded] = useState(false)
   const [error, setError] = useState(false)
 
@@ -37,8 +42,10 @@ export function ProductImage({ src, alt, className, aspect = 'square' }: Product
         <img
           src={src}
           alt={alt}
-          loading="lazy"
-          decoding="async"
+          loading={priority ? 'eager' : 'lazy'}
+          decoding={priority ? 'sync' : 'async'}
+          // @ts-expect-error fetchpriority aún no está en los tipos DOM de React
+          fetchpriority={priority ? 'high' : undefined}
           onLoad={() => setLoaded(true)}
           onError={() => setError(true)}
           className={cn(

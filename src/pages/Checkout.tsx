@@ -26,12 +26,14 @@ import { createOrderCheckout } from '@/services/checkout'
 import { getReservationDurationMinutes } from '@/services/settings'
 import { formatPrice } from '@/lib/format'
 import type { PaymentMethod, CustomerAddress, DeliveryMethod } from '@/lib/supabase/types'
+import { useNoIndex } from '@/lib/seo'
 
 function isValidUuid(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
 }
 
 export default function Checkout() {
+  useNoIndex('Checkout')
   const navigate = useNavigate()
   const { customer } = useAuth()
   const { items, subtotal, clearCart } = useCart()

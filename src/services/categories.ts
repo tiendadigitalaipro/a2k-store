@@ -30,6 +30,8 @@ export async function getActiveCategories(): Promise<{
         name: category.name,
         description: category.description ?? '',
         imageUrl: category.image_url ?? undefined,
+        seoTitle: category.seo_title ?? undefined,
+        seoDescription: category.seo_description ?? undefined,
       })) ?? [],
     error: null,
   }

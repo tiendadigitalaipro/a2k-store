@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { AuthShell } from '@/components/auth/AuthShell'
+import { useNoIndex } from '@/lib/seo'
 
 function safeNext(next: string | null): string {
   if (!next || !next.startsWith('/') || next.startsWith('//')) return '/'
@@ -18,6 +19,7 @@ function safeNext(next: string | null): string {
 }
 
 export default function AuthCallback() {
+  useNoIndex('Conectando con Google')
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const [error, setError] = useState<string | null>(null)
