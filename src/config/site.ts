@@ -3,7 +3,11 @@ export const SITE = {
   tagline: 'Tecnología que se siente premium',
   description:
     'Descubre productos tecnológicos seleccionados con diseño, calidad y una experiencia de compra moderna.',
-  url: 'https://store.a2kdigitalstudio.online',
+  // Dominio canónico: se toma de VITE_SITE_URL si existe (Vercel), con fallback
+  // al dominio propio. Al activar store.a2kdigitalstudio.online bastará con
+  // cambiar la variable VITE_SITE_URL en Vercel, sin tocar código.
+  url: (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, '') ||
+    'https://store.a2kdigitalstudio.online',
   locale: 'es',
   currency: 'USD',
   currencySymbol: '$',

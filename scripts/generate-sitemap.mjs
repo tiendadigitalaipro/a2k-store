@@ -22,9 +22,13 @@ import { dirname, join } from 'node:path'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PUBLIC_DIR = join(__dirname, '..', 'public')
 
-// Dominio canónico (mismo que src/config/site.ts). Se puede sobreescribir
-// con SITE_URL en el entorno de build.
-const BASE_URL = (process.env.SITE_URL || 'https://store.a2kdigitalstudio.online').replace(/\/$/, '')
+// Dominio canónico (mismo que src/config/site.ts). Preferimos VITE_SITE_URL
+// (la misma variable que usa la app) y mantenemos SITE_URL por compatibilidad.
+const BASE_URL = (
+  process.env.VITE_SITE_URL ||
+  process.env.SITE_URL ||
+  'https://store.a2kdigitalstudio.online'
+).replace(/\/$/, '')
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || ''
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || ''
