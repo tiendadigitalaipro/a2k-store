@@ -10,7 +10,7 @@
 | Fase actual | 18 (Catálogo real) — completada |
 | Bloque actual | G (Fases 18 + 19 + 20) |
 | Último bloque completado | B (Fases 2 + 3) — G parcial (Fase 18 completada) |
-| Último commit | `414da9a` (fix(auditoria-2026-11-19): portada y admin + docs) |
+| Último commit | `91940f3` (perf(fase-20): code-splitting por ruta) — **push pendiente** (token GitHub vencido) |
 | Rama | `main` |
 | Remote | `origin` → `git@github.com:tiendadigitalaipro/a2k-store.git` |
 | Estado del repositorio | Limpio (auditoría 2026-11-19 comprometida y desplegada) |
@@ -323,6 +323,16 @@ supabase/
 | Commits | `2e7284d` (fix portada y admin), `414da9a` (docs) |
 | Problemas | Ninguno bloqueante. Warning preexistente de chunk > 500 KB |
 | Siguiente acción | Fase 19: confirmar precios/stock reales; evaluar code-splitting del bundle |
+
+### Sesión 6 — 2026-11-20
+
+| Campo | Valor |
+|-------|-------|
+| Fecha | 2026-11-20 |
+| Trabajo realizado | Code-splitting por ruta (Fase 20): todas las páginas con React.lazy + Suspense. Bundle inicial 532KB → 437KB |
+| Commits | `91940f3` (local — **push bloqueado: token GitHub inválido; dueño debe re-autenticar con `gh auth login`**) |
+| Deploy | Vercel producción OK, verificado en vivo (home/catálogo/login) |
+| Siguiente acción | Push cuando se restaure acceso GitHub; Fase 19 (precios/stock) |
 
 **Bugs encontrados y corregidos:**
 
