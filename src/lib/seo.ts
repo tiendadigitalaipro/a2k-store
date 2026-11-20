@@ -169,7 +169,9 @@ export function organizationJsonLd(): SeoJsonLd {
     },
     address: {
       '@type': 'PostalAddress',
+      streetAddress: 'Urbanización Ciudad Betania',
       addressLocality: SITE.business.pickup,
+      addressRegion: 'Miranda',
       addressCountry: 'VE',
     },
   }

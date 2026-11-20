@@ -29,6 +29,7 @@ export function DeliverySelector({ value, onChange }: DeliverySelectorProps) {
             </div>
             <div>
               <p className="font-medium text-foreground">Retiro en {SITE.business.pickup}</p>
+              <p className="mt-1 text-xs text-muted">{SITE.business.pickupAddress}</p>
               <p className="mt-1 text-xs text-muted">
                 Horario: {SITE.business.hours}
               </p>

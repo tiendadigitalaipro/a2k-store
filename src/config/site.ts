@@ -13,14 +13,15 @@ export const SITE = {
   currencySymbol: '$',
   contact: {
     email: 'ceo@a2kdigitalstudio.online',
+    // Único canal telefónico: WhatsApp (lo pidió el dueño, 2026-11-19).
     phone: '+58 416 411 7331',
     whatsapp: '584164117331',
-    whatsappSecondary: '584126148666',
   },
   business: {
     name: 'A2K Store',
     hours: '7:00 a.m. – 10:00 p.m.',
     pickup: 'Ocumare del Tuy',
+    pickupAddress: 'Urbanización Ciudad Betania, Ocumare del Tuy, Estado Miranda',
     market: 'Venezuela',
   },
 } as const

@@ -45,7 +45,7 @@ export function Footer() {
               {SITE.description}
             </p>
             <p className="mt-4 text-sm text-muted">
-              {SITE.business.pickup}, {SITE.business.market} · Horario: {SITE.business.hours}
+              {SITE.business.pickupAddress}, {SITE.business.market} · Horario: {SITE.business.hours}
             </p>
           </div>
 
@@ -118,16 +118,7 @@ export function Footer() {
                   {SITE.contact.email}
                 </a>
               </li>
-              <li>
-                <a
-                  href={`https://wa.me/${SITE.contact.whatsappSecondary}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-muted transition-colors hover:text-foreground"
-                >
-                  Ventas corporativas
-                </a>
-              </li>
+              <li className="text-sm text-muted">Retiro: {SITE.business.pickupAddress}</li>
             </ul>
           </div>
         </div>
