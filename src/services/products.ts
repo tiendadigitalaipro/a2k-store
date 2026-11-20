@@ -181,7 +181,12 @@ export async function getFeaturedProducts(limit = 4): Promise<{
     .limit(limit)
 
   if (error) return { data: [], error: error.message }
-  if (!products || products.length === 0) return { data: [], error: null }
+  if (!products || products.length === 0) {
+    // Fallback: si el dueño aún no marca destacados, la portada muestra los
+    // más recientes en su lugar — la sección nunca debe quedar vacía.
+    const { data: newest } = await getNewProducts(limit)
+    return { data: newest ?? [], error: null }
+  }
 
   const productIds = products.map((p) => p.id)
 

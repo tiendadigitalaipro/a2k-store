@@ -337,18 +337,46 @@ export async function setPrimaryImage(productId: string, imageId: string): Promi
   }
 }
 
-export async function deleteProductImage(image: AdminImage): Promise<{ error: string | null }> {
+/**
+ * Borra una foto del producto.
+ *
+ * Orden intencional (auditoría 2026-11-19):
+ *  1) Borra primero el registro en `product_images` (fuente de verdad, RLS admin).
+ *     Así el dueño nunca queda bloqueado por un problema de Storage.
+ *  2) Luego intenta borrar el archivo en Storage (best-effort). Si falla, la
+ *     foto ya desapareció de la tienda y el archivo huérfano se puede limpiar
+ *     después sin afectar el catálogo.
+ *
+ * `warning` comunica limpiezas fallidas sin bloquear la operación.
+ */
+export async function deleteProductImage(
+  image: AdminImage,
+): Promise<{ error: string | null; warning?: string }> {
   try {
     const client = needClient()
-    const marker = '/storage/v1/object/public/products/'
-    const idx = image.url.indexOf(marker)
-    if (idx >= 0) {
-      const path = image.url.slice(idx + marker.length)
-      const { error: rmError } = await client.storage.from('products').remove([path])
-      if (rmError) return { error: `No se pudo borrar el archivo: ${rmError.message}` }
-    }
+
     const { error } = await client.from('product_images').delete().eq('id', image.id)
-    return { error: error?.message ?? null }
+    if (error) {
+      if (/row-level security|jwt|permission|not authorized/i.test(error.message)) {
+        return {
+          error:
+            'No se pudo borrar la foto: tu sesión no tiene permisos. Cierra sesión y vuelve a entrar como administrador.',
+        }
+      }
+      return { error: error.message }
+    }
+
+    const marker = '/storage/v1/object/public/products/'
+    const url = image.url ?? ''
+    const idx = url.indexOf(marker)
+    if (idx >= 0) {
+      const path = url.slice(idx + marker.length)
+      const { error: rmError } = await client.storage.from('products').remove([path])
+      if (rmError) {
+        return { error: null, warning: 'La foto se eliminó de la tienda, pero quedó el archivo en el almacén (se limpiará luego).' }
+      }
+    }
+    return { error: null }
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Error inesperado' }
   }

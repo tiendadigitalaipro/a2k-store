@@ -9,7 +9,8 @@ interface ProductBadgesProps {
 export function ProductBadges({ isNew, isFeatured, discount }: ProductBadgesProps) {
   return (
     <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-1.5">
-      {discount && discount > 0 && <Badge variant="success">-{discount}%</Badge>}
+      {/* OJO: nunca `discount && …` — si discount es 0 React renderiza el literal "0" */}
+      {(discount ?? 0) > 0 && <Badge variant="success">-{discount}%</Badge>}
       {isNew && <Badge variant="primary">Nuevo</Badge>}
       {isFeatured && !isNew && <Badge variant="warning">Destacado</Badge>}
     </div>

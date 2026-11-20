@@ -653,8 +653,10 @@ function ImagesSection({
                   title="Eliminar foto"
                   onClick={async () => {
                     if (!window.confirm('¿Eliminar esta foto?')) return
-                    const { error } = await deleteProductImage(img)
+                    const { error, warning } = await deleteProductImage(img)
                     if (error) setUploadError(error)
+                    else if (warning) setUploadError(warning)
+                    else setUploadError(null)
                     await onChanged()
                   }}
                   className="rounded-full bg-danger/90 p-1.5 text-white hover:bg-danger"

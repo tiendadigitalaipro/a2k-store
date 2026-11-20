@@ -36,3 +36,6 @@ collage_*.jpg
 *_temp.*
 media_inventory.json
 PRODUCT_MEDIA_UPLOAD_MANIFEST.json
+.vercel
+.env*
+dist.tar.gz

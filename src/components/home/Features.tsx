@@ -23,8 +23,14 @@ const features = [
 
 export function Features() {
   return (
-    <section className="py-16 md:py-24">
+    <section id="por-que-a2k" className="scroll-mt-20 py-16 md:py-24">
       <Container>
+        <div className="mb-10 text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+            ¿Por qué comprar en A2K Store?
+          </h2>
+          <p className="mt-2 text-muted">Compra simple, atención directa y productos que sí valen lo que cuestan.</p>
+        </div>
         <div className="grid gap-6 md:grid-cols-3">
           {features.map((feature, index) => (
             <motion.div
