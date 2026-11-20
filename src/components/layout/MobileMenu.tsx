@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/context/AuthContext'
 
 interface MobileMenuProps {
   open: boolean
@@ -11,6 +12,9 @@ interface MobileMenuProps {
 }
 
 export function MobileMenu({ open, onClose, links }: MobileMenuProps) {
+  const { user, profile } = useAuth()
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'superadmin'
+
   useEffect(() => {
     if (!open) return
     document.body.style.overflow = 'hidden'
@@ -65,6 +69,46 @@ export function MobileMenu({ open, onClose, links }: MobileMenuProps) {
             </NavLink>
           ))}
         </nav>
+
+        {/* Sesión — en el header estas opciones se ocultan en móvil, así que
+            deben vivir aquí o el cliente no podría iniciar sesión desde el teléfono */}
+        <div className="mt-6 border-t border-border pt-6">
+          {isAdmin && (
+            <Link
+              to="/admin"
+              onClick={onClose}
+              className="mb-2 block rounded-xl border border-primary/40 bg-primary/10 px-4 py-3 text-base font-semibold text-primary transition-colors hover:bg-primary/20"
+            >
+              Panel de administración
+            </Link>
+          )}
+          {user ? (
+            <Link
+              to="/mi-cuenta"
+              onClick={onClose}
+              className="block rounded-xl px-4 py-3 text-base font-medium text-muted transition-colors hover:bg-surface-elevated hover:text-foreground"
+            >
+              Mi cuenta
+            </Link>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <Link
+                to="/login"
+                onClick={onClose}
+                className="rounded-xl bg-primary px-4 py-3 text-center text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                Iniciar sesión
+              </Link>
+              <Link
+                to="/registro"
+                onClick={onClose}
+                className="rounded-xl border border-border px-4 py-3 text-center text-base font-medium text-muted transition-colors hover:bg-surface-elevated hover:text-foreground"
+              >
+                Crear cuenta
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </>
   )

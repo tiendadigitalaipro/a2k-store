@@ -271,9 +271,9 @@ export default function Catalog() {
           ))}
         </div>
 
-        {/* Search + Sort */}
-        <div className="flex gap-3">
-          <div className="relative w-full max-w-sm">
+        {/* Search + Sort (en móvil se apilan para no cortar el select) */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative w-full sm:max-w-sm">
             <Icon
               name="search"
               size={18}
@@ -291,7 +291,7 @@ export default function Catalog() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortOption)}
-            className="rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
+            className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none sm:w-auto"
             aria-label="Ordenar por"
           >
             <option value="relevance">Relevancia</option>
