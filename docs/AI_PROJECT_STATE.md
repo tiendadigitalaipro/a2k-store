@@ -10,10 +10,10 @@
 | Fase actual | 18 (Catálogo real) — completada |
 | Bloque actual | G (Fases 18 + 19 + 20) |
 | Último bloque completado | B (Fases 2 + 3) — G parcial (Fase 18 completada) |
-| Último commit | `6efa200` (feat(fase-3): auth context, login/register) |
+| Último commit | `414da9a` (fix(auditoria-2026-11-19): portada y admin + docs) |
 | Rama | `main` |
 | Remote | `origin` → `git@github.com:tiendadigitalaipro/a2k-store.git` |
-| Estado del repositorio | Modificado (migraciones 00021–00023, scripts de carga, reportes QA); sin commit |
+| Estado del repositorio | Limpio (auditoría 2026-11-19 comprometida y desplegada) |
 
 ## Completado
 
@@ -313,3 +313,24 @@ supabase/
 | Commits | (pendiente) |
 | Problemas | Ninguno crítico. Solo warnings no bloqueantes de React Router v7 y advertencia de chunk > 500 KB |
 | Siguiente acción | Fase 19: Configuración de negocio (precios reales, stock real, datos de negocio) |
+
+### Sesión 5 — 2026-11-19 (auditoría y correcciones)
+
+| Campo | Valor |
+|-------|-------|
+| Fecha | 2026-11-19 |
+| Trabajo realizado | Auditoría completa de la tienda en producción + correcciones |
+| Commits | `2e7284d` (fix portada y admin), `414da9a` (docs) |
+| Problemas | Ninguno bloqueante. Warning preexistente de chunk > 500 KB |
+| Siguiente acción | Fase 19: confirmar precios/stock reales; evaluar code-splitting del bundle |
+
+**Bugs encontrados y corregidos:**
+
+1. **ProductBadge renderizaba "0" en todas las tarjetas** — `{discount && discount > 0 && …}` con discount = 0 dibuja el literal "0" en React. Corregido a `{(discount ?? 0) > 0 && …}`.
+2. **Portada: sección "Destacados" vacía** — ningún producto tenía `is_featured`. Doble corrección: (a) `getFeaturedProducts` ahora hace fallback a los más recientes si no hay destacados; (b) en Supabase se marcó `is_featured = true` a los 5 productos de Electrónica (decisión comercial reversible desde admin).
+3. **Hero sin imágenes** — rediseñado: collage con 3 fotos reales del catálogo (los más recientes con imagen, desde Supabase), enlazadas a su ficha de producto. Fallback al texto centrado si no hay imágenes. Botón "Saber más" ahora ancla a la sección de beneficios (`#por-que-a2k`), que ganó título.
+4. **6 categorías demo activas** (tecnologia, audio, wearables, fotografia, accesorios, gaming) — aparecían en filtros del catálogo, footer y páginas de categoría vacías. Desactivadas en Supabase (`is_active = false`). Quedan 7 categorías reales activas.
+5. **Admin: "no puedo eliminar imagen"** — backend verificado sano (policies de Storage ALL para admin, `is_admin()` correcto, bucket OK, 0 imágenes huérfanas). Se endureció el flujo: ahora borra primero el registro en `product_images` (fuente de verdad) y luego el archivo en Storage como best-effort con `warning` no bloqueante; mensaje claro si la sesión no tiene permisos; URL null-safe.
+
+**Verificaciones:** `npm run build` limpio (494 módulos). GitHub `main` actualizado (`e8a500d..414da9a`). Deploy a Vercel completado y verificado en producción: destacados cargan (5 productos Electrónica), Hero con collage de 3 fotos reales, badge "0" eliminado, footer/filtros con las 7 categorías reales, "Saber más" ancla a beneficios.
+
