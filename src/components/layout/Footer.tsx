@@ -119,6 +119,16 @@ export function Footer() {
                 </a>
               </li>
               <li className="text-sm text-muted">Retiro: {SITE.business.pickupAddress}</li>
+              <li>
+                <a
+                  href={`https://wa.me/${SITE.contact.whatsappSecondary}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-muted transition-colors hover:text-foreground"
+                >
+                  WhatsApp +58 412 614 8666
+                </a>
+              </li>
             </ul>
           </div>
         </div>
